@@ -1,414 +1,879 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShamsiTree V4</title>
 
-<title>ShamsiTree V3.3</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
     margin:0;
     font-family:Arial,sans-serif;
-    background:#f4f6f8;
-    color:#222;
+    background:#f4f7fb;
+    color:#172033;
+}
+
+button,input,select,textarea{font:inherit}
+
+button{
+    cursor:pointer;
+    border:0;
+    border-radius:10px;
+    padding:11px 16px;
+}
+
+.primary{background:#1769aa;color:white}
+.danger{background:#d93025;color:white}
+.secondary{background:#e8eef5;color:#172033}
+
+.hidden{display:none!important}
+
+/* ================= AUTH ================= */
+
+#authScreen{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    background:linear-gradient(135deg,#eef4ff,#f8fbff);
+}
+
+.authBox{
+    width:100%;
+    max-width:430px;
+    background:white;
+    padding:25px;
+    border-radius:18px;
+    box-shadow:0 8px 30px #0001;
+}
+
+.logo{
+    text-align:center;
+    font-size:30px;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.logo span{color:#1769aa}
+
+.subtitle{
+    text-align:center;
+    color:#687386;
+    margin-bottom:20px;
+}
+
+.tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:20px;
+}
+
+.tabs button{flex:1;background:#e8eef5}
+.tabs .active{background:#1769aa;color:white}
+
+.field{margin-bottom:14px}
+
+.field label{
+    display:block;
+    margin-bottom:6px;
+    font-weight:bold;
+}
+
+.field input,
+.field select,
+.field textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #d6dce5;
+    border-radius:10px;
+    outline:none;
+}
+
+.field textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+#authButton{
+    width:100%;
+}
+
+#authMessage,
+#appMessage{
+    margin-top:12px;
+    padding:10px;
+    border-radius:8px;
+    display:none;
+}
+
+.success{background:#e5f7ed;color:#146c43}
+.error{background:#fde8e7;color:#a61b1b}
+
+/* ================= APP ================= */
+
+#app{
+    display:none;
+    min-height:100vh;
 }
 
 header{
-    background:#2c3e50;
+    background:#1769aa;
     color:white;
-    padding:25px 20px;
-    text-align:center;
+    padding:14px 18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
 }
 
 header h1{
     margin:0;
-    font-size:30px;
+    font-size:22px;
 }
 
-header p{
-    margin:8px 0 0;
-    font-size:16px;
+.userArea{
+    display:flex;
+    align-items:center;
+    gap:10px;
 }
 
-.container{
-    max-width:1100px;
-    margin:auto;
+.layout{
+    display:flex;
+    min-height:calc(100vh - 58px);
+}
+
+.sidebar{
+    width:220px;
+    background:#fff;
+    border-right:1px solid #e2e7ee;
+    padding:15px;
+}
+
+.sidebar button{
+    width:100%;
+    text-align:left;
+    margin-bottom:8px;
+    background:#f1f5f9;
+}
+
+.sidebar button.active{
+    background:#1769aa;
+    color:white;
+}
+
+.content{
+    flex:1;
     padding:20px;
+    overflow:auto;
 }
 
-.welcome{
-    background:white;
-    padding:25px;
-    border-radius:12px;
-    margin-bottom:20px;
-    box-shadow:0 3px 12px rgba(0,0,0,.08);
-}
+.page{display:none}
+.page.active{display:block}
 
-.welcome h2{
-    margin-top:0;
-}
+/* ================= DASHBOARD ================= */
 
-.grid{
+.cards{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-    gap:18px;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    margin-bottom:20px;
 }
 
 .card{
     background:white;
-    padding:22px;
-    border-radius:12px;
-    box-shadow:0 3px 12px rgba(0,0,0,.08);
+    padding:18px;
+    border-radius:15px;
+    box-shadow:0 3px 15px #0000000b;
+    margin-bottom:15px;
 }
 
-.card h3{
-    margin-top:0;
+.card h3{margin-top:0}
+
+.big{
+    font-size:30px;
+    font-weight:bold;
 }
 
-.card p{
-    line-height:1.5;
-    color:#555;
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:15px;
+    flex-wrap:wrap;
 }
 
-button{
+/* ================= MEMBERS ================= */
+
+.tableWrap{
+    background:white;
+    border-radius:15px;
+    overflow:auto;
+    box-shadow:0 3px 15px #0000000b;
+}
+
+table{
     width:100%;
-    border:0;
-    border-radius:8px;
-    padding:12px;
-    background:#2c3e50;
-    color:white;
-    font-size:15px;
-    cursor:pointer;
+    border-collapse:collapse;
 }
 
-button:hover{
-    opacity:.9;
+th,td{
+    padding:13px;
+    border-bottom:1px solid #edf0f4;
+    text-align:left;
 }
 
-input{
+th{background:#f7f9fc}
+
+.actions{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+}
+
+.search{
     width:100%;
     padding:12px;
-    margin:8px 0;
-    border:1px solid #ccc;
-    border-radius:8px;
-    font-size:15px;
-}
-
-.status{
-    margin-top:15px;
-    padding:12px;
-    border-radius:8px;
-    background:#eef5ff;
-}
-
-.member-form{
-    display:none;
-    margin-top:15px;
-    padding:15px;
-    background:#f8f9fa;
+    border:1px solid #d6dce5;
     border-radius:10px;
 }
 
-.member-list{
+/* ================= TREE ================= */
+
+.treeBox{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    min-height:300px;
+    overflow:auto;
+}
+
+.treePerson{
+    display:inline-block;
+    vertical-align:top;
+    min-width:190px;
+    margin:8px;
+    padding:15px;
+    background:#f7faff;
+    border:1px solid #dce7f4;
+    border-radius:14px;
+}
+
+.treePerson strong{
+    display:block;
+    font-size:17px;
+    margin-bottom:6px;
+}
+
+.treeChildren{
+    margin-left:25px;
+    padding-left:20px;
+    border-left:2px solid #b9cde2;
+}
+
+/* ================= MODAL ================= */
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:#0007;
+    z-index:20;
+    padding:20px;
+    overflow:auto;
+}
+
+.modalBox{
+    max-width:550px;
+    margin:40px auto;
+    background:white;
+    border-radius:18px;
+    padding:22px;
+}
+
+.modalActions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
     margin-top:15px;
 }
 
-.member-item{
-    background:#eef5ff;
-    padding:10px;
-    margin-top:8px;
-    border-radius:8px;
-}
+/* ================= MOBILE ================= */
 
-footer{
-    text-align:center;
-    padding:30px 20px;
-    color:#666;
+@media(max-width:800px){
+
+    .layout{
+        display:block;
+    }
+
+    .sidebar{
+        width:100%;
+        border-right:0;
+        border-bottom:1px solid #e2e7ee;
+        display:flex;
+        overflow:auto;
+        gap:7px;
+    }
+
+    .sidebar button{
+        width:auto;
+        min-width:max-content;
+        margin:0;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .content{
+        padding:15px;
+    }
+
+    header{
+        padding:12px;
+    }
+
+    .userArea span{
+        display:none;
+    }
 }
 </style>
-
 </head>
 
 <body>
 
+<!-- =====================================================
+     AUTH
+===================================================== -->
+
+<div id="authScreen">
+
+<div class="authBox">
+
+<div class="logo">🌳 <span>ShamsiTree</span></div>
+
+<div class="subtitle">
+Family Tree • English • हिन्दी • اردو
+</div>
+
+<div class="tabs">
+
+<button id="loginTab"
+class="active"
+onclick="showAuth('login')">
+Login
+</button>
+
+<button id="registerTab"
+onclick="showAuth('register')">
+Register
+</button>
+
+</div>
+
+<div id="registerFields" style="display:none">
+
+<div class="field">
+<label>Full Name</label>
+<input id="registerName" type="text">
+</div>
+
+</div>
+
+<div class="field">
+<label>Email</label>
+<input id="email" type="email" autocomplete="email">
+</div>
+
+<div class="field">
+<label>Password</label>
+<input id="password" type="password" autocomplete="current-password">
+</div>
+
+<button
+class="primary"
+id="authButton"
+onclick="submitAuth()">
+Login
+</button>
+
+<div id="authMessage"></div>
+
+</div>
+</div>
+
+
+<!-- =====================================================
+     APP
+===================================================== -->
+
+<div id="app">
+
 <header>
-    <h1>🌳 ShamsiTree</h1>
-    <p>Family Tree Project</p>
+
+<h1>🌳 ShamsiTree</h1>
+
+<div class="userArea">
+
+<span id="userEmail"></span>
+
+<button
+class="secondary"
+onclick="logout()">
+Logout
+</button>
+
+</div>
+
 </header>
 
-<div class="container">
 
-<div class="welcome">
+<div class="layout">
 
-    <h2>Welcome to ShamsiTree</h2>
+<aside class="sidebar">
 
-    <p>
-        Build and manage your family tree in one place.
-    </p>
+<button class="active"
+onclick="openPage('dashboard',this)">
+🏠 Dashboard
+</button>
 
-    <p>
-        ShamsiTree will support English, Hindi and Urdu.
-    </p>
+<button onclick="openPage('tree',this)">
+🌳 My Tree
+</button>
 
-    <div class="status" id="connectionStatus">
-        Checking Supabase connection...
-    </div>
+<button onclick="openPage('members',this)">
+👨‍👩‍👧 Members
+</button>
 
+<button onclick="openPage('search',this)">
+🔎 Search
+</button>
+
+<button onclick="openPage('settings',this)">
+⚙️ Settings
+</button>
+
+</aside>
+
+
+<main class="content">
+
+<div id="appMessage"></div>
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<section id="dashboard" class="page active">
+
+<h2 id="dashboardTitle">Dashboard</h2>
+
+<div class="cards">
+
+<div class="card">
+<h3>My Family Tree</h3>
+<div class="big" id="treeName">-</div>
 </div>
 
+<div class="card">
+<h3>Family Members</h3>
+<div class="big" id="memberCount">0</div>
+</div>
 
-<div class="grid">
-
-    <div class="card">
-
-        <h3>👨‍👩‍👧 Family Members</h3>
-
-        <p>
-            Add and manage family members.
-        </p>
-
-        <button onclick="openFamilyMembers()">
-            Open
-        </button>
-
-        <div class="member-form" id="memberForm">
-
-            <input
-                type="text"
-                id="memberName"
-                placeholder="Enter full name"
-            >
-
-            <button onclick="saveMember()">
-                💾 Save Member
-            </button>
-
-            <div
-                class="member-list"
-                id="memberList">
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>🌳 Family Tree</h3>
-
-        <p>
-            View and manage your family tree.
-        </p>
-
-        <button onclick="showMessage('Family Tree')">
-            Open
-        </button>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>🔗 Family Connections</h3>
-
-        <p>
-            Connect your family with other family trees.
-        </p>
-
-        <button onclick="showMessage('Family Connections')">
-            Open
-        </button>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>📊 Family Data</h3>
-
-        <p>
-            Manage your saved family information.
-        </p>
-
-        <button onclick="showMessage('Family Data')">
-            Open
-        </button>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>🌐 Languages</h3>
-
-        <p>
-            English, Hindi and Urdu support.
-        </p>
-
-        <button onclick="showMessage('Languages')">
-            Open
-        </button>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>⚙️ Settings</h3>
-
-        <p>
-            Manage ShamsiTree settings.
-        </p>
-
-        <button onclick="showMessage('Settings')">
-            Open
-        </button>
-
-    </div>
-
+<div class="card">
+<h3>Connected Families</h3>
+<div class="big" id="connectionCount">0</div>
 </div>
 
 </div>
 
+<div class="card">
 
-<footer>
-    © 2026 ShamsiTree — Family Tree Project
-</footer>
+<h3>Welcome to ShamsiTree 🌳</h3>
+
+<p id="welcomeText">
+Build and manage your family history in one place.
+</p>
+
+</div>
+
+</section>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- ================= TREE ================= -->
+
+<section id="tree" class="page">
+
+<div class="topbar">
+
+<h2 id="treeTitle">My Family Tree</h2>
+
+<button
+class="primary"
+onclick="openMemberModal()">
++ Add Member
+</button>
+
+</div>
+
+<div
+class="treeBox"
+id="treeContainer">
+Loading...
+</div>
+
+</section>
+
+
+<!-- ================= MEMBERS ================= -->
+
+<section id="members" class="page">
+
+<div class="topbar">
+
+<h2 id="membersTitle">Members</h2>
+
+<button
+class="primary"
+onclick="openMemberModal()">
++ Add Member
+</button>
+
+</div>
+
+<div class="tableWrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Name</th>
+<th>Gender</th>
+<th>Date of Birth</th>
+<th>Location</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody id="membersTable"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+
+<!-- ================= SEARCH ================= -->
+
+<section id="search" class="page">
+
+<h2>🔎 Search Family Members</h2>
+
+<input
+class="search"
+id="searchInput"
+placeholder="Search member name..."
+oninput="searchMembers()">
+
+<div id="searchResults" style="margin-top:15px"></div>
+
+</section>
+
+
+<!-- ================= SETTINGS ================= -->
+
+<section id="settings" class="page">
+
+<h2>⚙️ Settings</h2>
+
+<div class="card">
+
+<div class="field">
+
+<label>Language</label>
+
+<select
+id="languageSelect"
+onchange="changeLanguage()">
+
+<option value="en">English</option>
+<option value="hi">हिन्दी</option>
+<option value="ur">اردو</option>
+
+</select>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+</div>
+</div>
+
+
+<!-- =====================================================
+     MEMBER MODAL
+===================================================== -->
+
+<div class="modal" id="memberModal">
+
+<div class="modalBox">
+
+<h2 id="modalTitle">Add Family Member</h2>
+
+<input type="hidden" id="editMemberId">
+
+
+<div class="field">
+
+<label>Full Name</label>
+
+<input
+id="memberName"
+type="text"
+required>
+
+</div>
+
+
+<div class="field">
+
+<label>Gender</label>
+
+<select id="memberGender">
+
+<option value="male">Male</option>
+<option value="female">Female</option>
+<option value="other">Other</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>Date of Birth</label>
+
+<input
+id="memberDob"
+type="date">
+
+</div>
+
+
+<div class="field">
+
+<label>Phone</label>
+
+<input
+id="memberPhone"
+type="tel">
+
+</div>
+
+
+<div class="field">
+
+<label>Location</label>
+
+<input
+id="memberLocation"
+type="text">
+
+</div>
+
+
+<!-- RELATIONSHIPS -->
+
+<div class="field">
+
+<label>Father</label>
+
+<select id="fatherId">
+
+<option value="">
+Select Father
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>Mother</label>
+
+<select id="motherId">
+
+<option value="">
+Select Mother
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>Husband / Wife</label>
+
+<select id="spouseId">
+
+<option value="">
+Select Spouse
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>Notes</label>
+
+<textarea id="memberNotes"></textarea>
+
+</div>
+
+
+<div class="modalActions">
+
+<button
+class="secondary"
+onclick="closeMemberModal()">
+Cancel
+</button>
+
+<button
+class="primary"
+onclick="saveMember()">
+Save Member
+</button>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- =====================================================
+     SCRIPT
+===================================================== -->
 
 <script>
 
+/* =====================================================
+   SUPABASE CONFIGURATION
+=====================================================
+
+   IMPORTANT:
+   یہاں اپنی اصل Supabase URL اور Publishable Key
+   استعمال کریں۔
+
+   Secret / service_role key استعمال نہ کریں۔
+===================================================== */
+
 const SUPABASE_URL =
-    "https://qhobvzbjbsbtmorllnjz.supabase.co";
+"PASTE_YOUR_SUPABASE_URL_HERE";
 
 const SUPABASE_KEY =
-    "sb_publishable_WLNi83Y4WWxhivd4fGqfWA_SHNfqERp";
-
-let supabaseClient = null;
+"PASTE_YOUR_PUBLISHABLE_KEY_HERE";
 
 
-/* -----------------------------
-   STATUS
------------------------------ */
-
-function updateStatus(message){
-
-    const status =
-        document.getElementById("connectionStatus");
-
-    if(status){
-        status.innerHTML = message;
-    }
-
-}
+const supabaseClient =
+supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
 
-/* -----------------------------
-   SUPABASE CONNECTION
------------------------------ */
+/* =====================================================
+   GLOBAL DATA
+===================================================== */
 
-try{
+let currentUser = null;
+let currentTree = null;
+let members = [];
+let relationships = [];
+let currentLanguage = "en";
 
-    if(
-        SUPABASE_KEY &&
-        !SUPABASE_KEY.includes(
-            "PASTE_YOUR_SUPABASE"
-        )
-    ){
 
-        supabaseClient =
-            window.supabase.createClient(
-                SUPABASE_URL,
-                SUPABASE_KEY
-            );
+/* =====================================================
+   AUTH
+===================================================== */
 
-        updateStatus(
-            "✅ Supabase connection is ready."
-        );
+let authMode = "login";
 
-        console.log(
-            "ShamsiTree Supabase connected"
-        );
 
-    }else{
+function showAuth(mode){
 
-        updateStatus(
-            "⚠️ Supabase Publishable Key is not added yet."
-        );
+    authMode = mode;
 
-    }
-
-}catch(error){
-
-    console.error(
-        "Supabase error:",
-        error
+    document
+    .getElementById("loginTab")
+    .classList.toggle(
+        "active",
+        mode === "login"
     );
 
-    updateStatus(
-        "❌ Supabase connection error."
+    document
+    .getElementById("registerTab")
+    .classList.toggle(
+        "active",
+        mode === "register"
     );
 
+    document
+    .getElementById("registerFields")
+    .style.display =
+        mode === "register"
+        ? "block"
+        : "none";
+
+    document
+    .getElementById("authButton")
+    .textContent =
+        mode === "login"
+        ? "Login"
+        : "Create Account";
+
+    clearAuthMessage();
 }
 
 
-/* -----------------------------
-   FAMILY MEMBERS
------------------------------ */
+async function submitAuth(){
 
-function openFamilyMembers(){
+    clearAuthMessage();
 
-    const form =
-        document.getElementById("memberForm");
+    const email =
+        document
+        .getElementById("email")
+        .value
+        .trim();
 
-    if(form){
+    const password =
+        document
+        .getElementById("password")
+        .value;
 
-        form.style.display =
-            form.style.display === "block"
-            ? "none"
-            : "block";
+    if(!email || !password){
 
-    }
-
-}
-
-
-/* -----------------------------
-   SAVE MEMBER
------------------------------ */
-
-async function saveMember(){
-
-    if(!supabaseClient){
-
-        alert(
-            "Supabase is not connected yet."
-        );
-
-        return;
-    }
-
-
-    const nameInput =
-        document.getElementById("memberName");
-
-    const name =
-        nameInput.value.trim();
-
-
-    if(!name){
-
-        alert(
-            "Please enter the family member's full name."
+        showAuthMessage(
+            "Please enter email and password.",
+            "error"
         );
 
         return;
@@ -417,134 +882,1806 @@ async function saveMember(){
 
     try{
 
-        const { data, error } =
-            await supabaseClient
-                .from("family_members")
-                .insert([
-                    {
-                        full_name: name
+        if(authMode === "register"){
+
+            const name =
+                document
+                .getElementById("registerName")
+                .value
+                .trim();
+
+            if(!name){
+
+                showAuthMessage(
+                    "Please enter your name.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            const {data,error} =
+                await supabaseClient.auth.signUp({
+
+                    email:email,
+
+                    password:password,
+
+                    options:{
+                        data:{
+                            display_name:name
+                        }
                     }
-                ])
-                .select();
+
+                });
 
 
-        if(error){
+            if(error) throw error;
 
-            console.error(
-                "Save member error:",
-                error
-            );
 
-            alert(
-                "❌ Member could not be saved."
+            if(data.session){
+
+                await startApp(data.session);
+
+            }else{
+
+                showAuthMessage(
+                    "Account created. Please check your email if verification is required.",
+                    "success"
+                );
+
+            }
+
+        }else{
+
+            const {data,error} =
+                await supabaseClient.auth.signInWithPassword({
+
+                    email:email,
+
+                    password:password
+
+                });
+
+
+            if(error) throw error;
+
+            await startApp(data.session);
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+        showAuthMessage(
+            error.message ||
+            "Authentication failed.",
+            "error"
+        );
+
+    }
+}
+
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+async function checkSession(){
+
+    const {data,error} =
+        await supabaseClient.auth.getSession();
+
+    if(error){
+
+        console.error(error);
+
+        showAuthScreen();
+
+        return;
+    }
+
+
+    if(data.session){
+
+        await startApp(data.session);
+
+    }else{
+
+        showAuthScreen();
+
+    }
+
+
+    supabaseClient.auth.onAuthStateChange(
+        async(event,session)=>{
+
+            if(event === "SIGNED_OUT"){
+
+                currentUser = null;
+                currentTree = null;
+                members = [];
+                relationships = [];
+
+                showAuthScreen();
+
+            }
+
+        }
+    );
+}
+
+
+async function startApp(session){
+
+    if(!session || !session.user){
+
+        showAuthScreen();
+
+        return;
+    }
+
+
+    currentUser = session.user;
+
+
+    document
+    .getElementById("authScreen")
+    .style.display = "none";
+
+
+    document
+    .getElementById("app")
+    .style.display = "block";
+
+
+    document
+    .getElementById("userEmail")
+    .textContent =
+        currentUser.email || "";
+
+
+    await loadProfile();
+
+    await loadTree();
+
+}
+
+
+function showAuthScreen(){
+
+    document
+    .getElementById("authScreen")
+    .style.display = "flex";
+
+    document
+    .getElementById("app")
+    .style.display = "none";
+}
+
+
+async function logout(){
+
+    await supabaseClient.auth.signOut();
+
+    currentUser = null;
+    currentTree = null;
+    members = [];
+    relationships = [];
+
+    showAuthScreen();
+
+}
+
+
+/* =====================================================
+   PROFILE
+===================================================== */
+
+async function loadProfile(){
+
+    if(!currentUser) return;
+
+
+    const {data,error} =
+        await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id",currentUser.id)
+        .maybeSingle();
+
+
+    if(error){
+
+        console.error(error);
+
+        return;
+    }
+
+
+    if(data){
+
+        currentLanguage =
+            data.preferred_language || "en";
+
+
+        const language =
+            document
+            .getElementById("languageSelect");
+
+        if(language){
+
+            language.value =
+                currentLanguage;
+
+        }
+
+
+        applyLanguage();
+
+    }
+
+}
+
+
+/* =====================================================
+   FAMILY TREE
+===================================================== */
+
+async function loadTree(){
+
+    if(!currentUser) return;
+
+
+    const {data,error} =
+        await supabaseClient
+        .from("family_trees")
+        .select("*")
+        .eq(
+            "owner_user_id",
+            currentUser.id
+        )
+        .order(
+            "created_at",
+            {ascending:true}
+        )
+        .limit(1)
+        .maybeSingle();
+
+
+    if(error){
+
+        console.error(error);
+
+        showAppMessage(
+            "Could not load family tree: " +
+            error.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    if(data){
+
+        currentTree = data;
+
+    }else{
+
+        const {data:newTree,error:createError} =
+            await supabaseClient
+            .from("family_trees")
+            .insert({
+
+                owner_user_id:
+                    currentUser.id,
+
+                name:
+                    "My Family Tree"
+
+            })
+            .select()
+            .single();
+
+
+        if(createError){
+
+            console.error(createError);
+
+            showAppMessage(
+                "Could not create family tree: " +
+                createError.message,
+                "error"
             );
 
             return;
         }
 
 
-        alert(
-            "✅ Family member saved successfully."
-        );
-
-
-        nameInput.value = "";
-
-
-        loadMembers();
-
-
-    }catch(error){
-
-        console.error(
-            "Unexpected error:",
-            error
-        );
-
-        alert(
-            "❌ Something went wrong."
-        );
+        currentTree = newTree;
 
     }
+
+
+    document
+    .getElementById("treeName")
+    .textContent =
+        currentTree.name;
+
+
+    await loadMembers();
 
 }
 
 
-/* -----------------------------
+/* =====================================================
    LOAD MEMBERS
------------------------------ */
+===================================================== */
 
 async function loadMembers(){
 
-    if(!supabaseClient){
-        return;
-    }
+    if(!currentTree) return;
 
 
-    const list =
-        document.getElementById("memberList");
-
-
-    const { data, error } =
+    const {data,error} =
         await supabaseClient
-            .from("family_members")
-            .select("id, full_name")
-            .order("full_name");
+        .from("family_members")
+        .select("*")
+        .eq(
+            "tree_id",
+            currentTree.id
+        )
+        .order(
+            "full_name",
+            {ascending:true}
+        );
 
 
     if(error){
 
-        console.error(
-            "Load members error:",
-            error
+        console.error(error);
+
+        showAppMessage(
+            "Could not load members: " +
+            error.message,
+            "error"
         );
 
         return;
     }
 
 
-    list.innerHTML = "";
+    members = data || [];
 
 
-    if(!data || data.length === 0){
+    await loadRelationships();
 
-        list.innerHTML =
-            "<p>No family members added yet.</p>";
+    renderMembers();
+
+    renderTree();
+
+    document
+    .getElementById("memberCount")
+    .textContent =
+        members.length;
+
+}
+
+
+/* =====================================================
+   LOAD RELATIONSHIPS
+===================================================== */
+
+async function loadRelationships(){
+
+    if(!currentTree){
+
+        relationships = [];
 
         return;
     }
 
 
-    data.forEach(member => {
+    const {data,error} =
+        await supabaseClient
+        .from("relationships")
+        .select("*")
+        .eq(
+            "tree_id",
+            currentTree.id
+        );
 
-        const item =
-            document.createElement("div");
 
-        item.className =
-            "member-item";
+    if(error){
 
-        item.textContent =
-            "👤 " + member.full_name;
+        console.error(error);
 
-        list.appendChild(item);
+        relationships = [];
+
+        return;
+    }
+
+
+    relationships = data || [];
+
+}
+
+
+/* =====================================================
+   RELATIONSHIP LISTS
+===================================================== */
+
+function populateRelationshipLists(excludeId=null){
+
+    const father =
+        document.getElementById("fatherId");
+
+    const mother =
+        document.getElementById("motherId");
+
+    const spouse =
+        document.getElementById("spouseId");
+
+
+    father.innerHTML =
+        '<option value="">Select Father</option>';
+
+    mother.innerHTML =
+        '<option value="">Select Mother</option>';
+
+    spouse.innerHTML =
+        '<option value="">Select Spouse</option>';
+
+
+    members.forEach(member=>{
+
+        if(excludeId &&
+           member.id === excludeId){
+
+            return;
+        }
+
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            member.id;
+
+        option.textContent =
+            member.full_name;
+
+
+        father.appendChild(
+            option.cloneNode(true)
+        );
+
+        mother.appendChild(
+            option.cloneNode(true)
+        );
+
+        spouse.appendChild(
+            option.cloneNode(true)
+        );
 
     });
 
 }
 
 
-/* -----------------------------
-   OTHER SECTIONS
------------------------------ */
+/* =====================================================
+   FIND RELATIONSHIP
+===================================================== */
 
-function showMessage(section){
+function findRelationship(
+    personId,
+    relatedId,
+    type
+){
 
-    alert(
-        section +
-        " — Coming Soon"
+    return relationships.some(r=>
+        r.person_id === personId &&
+        r.related_person_id === relatedId &&
+        r.relation_type === type
     );
 
 }
+
+
+/* =====================================================
+   CREATE RELATIONSHIP
+===================================================== */
+
+async function createRelationship(
+    personId,
+    relatedId,
+    type
+){
+
+    if(!currentTree) return;
+
+
+    if(!personId || !relatedId) return;
+
+
+    const exists =
+        findRelationship(
+            personId,
+            relatedId,
+            type
+        );
+
+
+    if(exists) return;
+
+
+    const {error} =
+        await supabaseClient
+        .from("relationships")
+        .insert({
+
+            tree_id:currentTree.id,
+
+            person_id:personId,
+
+            related_person_id:relatedId,
+
+            relation_type:type
+
+        });
+
+
+    if(error){
+
+        console.error(
+            "Relationship error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   SAVE RELATIONSHIPS
+===================================================== */
+
+async function saveRelationships(
+    personId,
+    fatherId,
+    motherId,
+    spouseId
+){
+
+    if(!currentTree) return;
+
+
+    /*
+       Parent relationship:
+       person -> father
+       person -> mother
+
+       Spouse:
+       person -> spouse
+       spouse -> person
+    */
+
+
+    if(fatherId){
+
+        await createRelationship(
+            personId,
+            fatherId,
+            "parent"
+        );
+
+    }
+
+
+    if(motherId){
+
+        await createRelationship(
+            personId,
+            motherId,
+            "parent"
+        );
+
+    }
+
+
+    if(spouseId){
+
+        await createRelationship(
+            personId,
+            spouseId,
+            "spouse"
+        );
+
+        await createRelationship(
+            spouseId,
+            personId,
+            "spouse"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   MEMBER MODAL
+===================================================== */
+
+function openMemberModal(member=null){
+
+    populateRelationshipLists(
+        member ? member.id : null
+    );
+
+
+    document
+    .getElementById("memberModal")
+    .style.display = "block";
+
+
+    document
+    .getElementById("editMemberId")
+    .value =
+        member ? member.id : "";
+
+
+    document
+    .getElementById("modalTitle")
+    .textContent =
+        member
+        ? "Edit Family Member"
+        : "Add Family Member";
+
+
+    document
+    .getElementById("memberName")
+    .value =
+        member?.full_name || "";
+
+
+    document
+    .getElementById("memberGender")
+    .value =
+        member?.gender || "male";
+
+
+    document
+    .getElementById("memberDob")
+    .value =
+        member?.date_of_birth || "";
+
+
+    document
+    .getElementById("memberPhone")
+    .value =
+        member?.phone || "";
+
+
+    document
+    .getElementById("memberLocation")
+    .value =
+        member?.location || "";
+
+
+    document
+    .getElementById("memberNotes")
+    .value =
+        member?.notes || "";
+
+
+    if(member){
+
+        const parents =
+            relationships.filter(r=>
+                r.person_id === member.id &&
+                r.relation_type === "parent"
+            );
+
+
+        const spouse =
+            relationships.find(r=>
+                r.person_id === member.id &&
+                r.relation_type === "spouse"
+            );
+
+
+        /*
+           We do not yet assume which parent is
+           father/mother from database alone.
+           The first parent is shown as father.
+           This can be improved later with a
+           dedicated relation_type if required.
+        */
+
+
+        if(parents.length > 0){
+
+            document
+            .getElementById("fatherId")
+            .value =
+                parents[0].related_person_id;
+
+        }
+
+
+        if(parents.length > 1){
+
+            document
+            .getElementById("motherId")
+            .value =
+                parents[1].related_person_id;
+
+        }
+
+
+        if(spouse){
+
+            document
+            .getElementById("spouseId")
+            .value =
+                spouse.related_person_id;
+
+        }
+
+    }
+
+}
+
+
+function closeMemberModal(){
+
+    document
+    .getElementById("memberModal")
+    .style.display = "none";
+
+}
+
+
+/* =====================================================
+   SAVE MEMBER
+===================================================== */
+
+async function saveMember(){
+
+    if(!currentUser || !currentTree){
+
+        alert(
+            "Please login and make sure your family tree is ready."
+        );
+
+        return;
+    }
+
+
+    const id =
+        document
+        .getElementById("editMemberId")
+        .value;
+
+
+    const full_name =
+        document
+        .getElementById("memberName")
+        .value
+        .trim();
+
+
+    const gender =
+        document
+        .getElementById("memberGender")
+        .value;
+
+
+    const date_of_birth =
+        document
+        .getElementById("memberDob")
+        .value ||
+        null;
+
+
+    const phone =
+        document
+        .getElementById("memberPhone")
+        .value
+        .trim() ||
+        null;
+
+
+    const location =
+        document
+        .getElementById("memberLocation")
+        .value
+        .trim() ||
+        null;
+
+
+    const notes =
+        document
+        .getElementById("memberNotes")
+        .value
+        .trim() ||
+        null;
+
+
+    const fatherId =
+        document
+        .getElementById("fatherId")
+        .value ||
+        null;
+
+
+    const motherId =
+        document
+        .getElementById("motherId")
+        .value ||
+        null;
+
+
+    const spouseId =
+        document
+        .getElementById("spouseId")
+        .value ||
+        null;
+
+
+    if(!full_name){
+
+        alert(
+            "Please enter member name."
+        );
+
+        return;
+    }
+
+
+    try{
+
+        let memberId = id;
+
+
+        if(id){
+
+            const {error} =
+                await supabaseClient
+                .from("family_members")
+                .update({
+
+                    full_name,
+
+                    gender,
+
+                    date_of_birth,
+
+                    phone,
+
+                    location,
+
+                    notes,
+
+                    updated_at:
+                        new Date()
+                        .toISOString()
+
+                })
+                .eq("id",id)
+                .eq(
+                    "tree_id",
+                    currentTree.id
+                );
+
+
+            if(error) throw error;
+
+
+        }else{
+
+            const {data,error} =
+                await supabaseClient
+                .from("family_members")
+                .insert({
+
+                    tree_id:
+                        currentTree.id,
+
+                    full_name,
+
+                    gender,
+
+                    date_of_birth,
+
+                    phone,
+
+                    location,
+
+                    notes,
+
+                    created_by:
+                        currentUser.id
+
+                })
+                .select()
+                .single();
+
+
+            if(error) throw error;
+
+
+            memberId = data.id;
+
+        }
+
+
+        /*
+           Save relationships separately.
+           This matches the database design.
+        */
+
+        await saveRelationships(
+            memberId,
+            fatherId,
+            motherId,
+            spouseId
+        );
+
+
+        closeMemberModal();
+
+        await loadMembers();
+
+        showAppMessage(
+            id
+            ? "Member updated successfully."
+            : "Member added successfully.",
+            "success"
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "Could not save member:\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   DELETE MEMBER
+===================================================== */
+
+async function deleteMember(id){
+
+    const member =
+        members.find(
+            m=>m.id === id
+        );
+
+
+    if(!member) return;
+
+
+    const ok =
+        confirm(
+            `Delete "${member.full_name}"?`
+        );
+
+
+    if(!ok) return;
+
+
+    try{
+
+        /*
+           relationships are automatically deleted
+           by database cascade because they reference
+           family_members.
+        */
+
+
+        const {error} =
+            await supabaseClient
+            .from("family_members")
+            .delete()
+            .eq("id",id)
+            .eq(
+                "tree_id",
+                currentTree.id
+            );
+
+
+        if(error) throw error;
+
+
+        await loadMembers();
+
+
+        showAppMessage(
+            "Member deleted successfully.",
+            "success"
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "Could not delete member:\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   EDIT MEMBER
+===================================================== */
+
+function editMember(id){
+
+    const member =
+        members.find(
+            m=>m.id === id
+        );
+
+
+    if(member){
+
+        openMemberModal(member);
+
+    }
+
+}
+
+
+/* =====================================================
+   RENDER MEMBERS
+===================================================== */
+
+function renderMembers(){
+
+    const tbody =
+        document
+        .getElementById("membersTable");
+
+
+    tbody.innerHTML = "";
+
+
+    if(!members.length){
+
+        tbody.innerHTML = `
+        <tr>
+            <td
+            colspan="5"
+            style="text-align:center;padding:30px">
+
+            No family members yet.
+            Add your first family member.
+
+            </td>
+        </tr>`;
+
+        return;
+    }
+
+
+    members.forEach(member=>{
+
+        const tr =
+            document.createElement("tr");
+
+
+        tr.innerHTML = `
+
+        <td>
+            ${escapeHtml(
+                member.full_name
+            )}
+        </td>
+
+        <td>
+            ${escapeHtml(
+                member.gender || ""
+            )}
+        </td>
+
+        <td>
+            ${escapeHtml(
+                member.date_of_birth || ""
+            )}
+        </td>
+
+        <td>
+            ${escapeHtml(
+                member.location || ""
+            )}
+        </td>
+
+        <td>
+
+        <div class="actions">
+
+        <button
+        class="secondary"
+        onclick="editMember('${member.id}')">
+        Edit
+        </button>
+
+        <button
+        class="danger"
+        onclick="deleteMember('${member.id}')">
+        Delete
+        </button>
+
+        </div>
+
+        </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+/* =====================================================
+   TREE DISPLAY
+===================================================== */
+
+function renderTree(){
+
+    const container =
+        document
+        .getElementById("treeContainer");
+
+
+    if(!members.length){
+
+        container.innerHTML = `
+
+        <h3>Your family tree is empty.</h3>
+
+        <p>
+        Add your first family member
+        to begin your family tree.
+        </p>
+
+        `;
+
+        return;
+    }
+
+
+    /*
+       Build a simple relationship-aware tree.
+    */
+
+    const childMap = {};
+
+
+    members.forEach(member=>{
+
+        childMap[member.id] = [];
+
+    });
+
+
+    relationships
+    .filter(r=>
+        r.relation_type === "parent"
+    )
+    .forEach(r=>{
+
+        /*
+           person_id = child
+           related_person_id = parent
+        */
+
+        if(childMap[r.related_person_id]){
+
+            childMap[
+                r.related_person_id
+            ].push(r.person_id);
+
+        }
+
+    });
+
+
+    const hasParent =
+        new Set(
+            relationships
+            .filter(r=>
+                r.relation_type === "parent"
+            )
+            .map(r=>r.person_id)
+        );
+
+
+    const roots =
+        members.filter(
+            member =>
+                !hasParent.has(member.id)
+        );
+
+
+    let html = `
+
+    <h3>
+        🌳 ${escapeHtml(
+            currentTree?.name ||
+            "My Family Tree"
+        )}
+    </h3>
+
+    `;
+
+
+    const used = new Set();
+
+
+    function renderPerson(
+        memberId,
+        depth=0
+    ){
+
+        const member =
+            members.find(
+                m=>m.id === memberId
+            );
+
+
+        if(!member) return "";
+
+
+        if(used.has(memberId)){
+
+            return "";
+
+        }
+
+
+        used.add(memberId);
+
+
+        let result = `
+
+        <div
+        class="treePerson"
+        style="margin-left:${depth*15}px">
+
+        <strong>
+        ${escapeHtml(
+            member.full_name
+        )}
+        </strong>
+
+        <div>
+        ${escapeHtml(
+            member.gender || ""
+        )}
+        </div>
+
+        ${
+            member.date_of_birth
+            ?
+            `<div>🎂 ${escapeHtml(
+                member.date_of_birth
+            )}</div>`
+            :
+            ""
+        }
+
+        ${
+            member.location
+            ?
+            `<div>📍 ${escapeHtml(
+                member.location
+            )}</div>`
+            :
+            ""
+        }
+
+        <br>
+
+        <button
+        class="secondary"
+        onclick="editMember('${member.id}')">
+        Edit
+        </button>
+
+        </div>
+        `;
+
+
+        const children =
+            childMap[memberId] || [];
+
+
+        if(children.length){
+
+            result += `
+            <div class="treeChildren">
+            `;
+
+
+            children.forEach(childId=>{
+
+                result +=
+                    renderPerson(
+                        childId,
+                        depth+1
+                    );
+
+            });
+
+
+            result += `
+            </div>
+            `;
+
+        }
+
+
+        return result;
+
+    }
+
+
+    roots.forEach(root=>{
+
+        html +=
+            renderPerson(root.id);
+
+    });
+
+
+    /*
+       Add disconnected members.
+    */
+
+    members.forEach(member=>{
+
+        if(!used.has(member.id)){
+
+            html +=
+                renderPerson(member.id);
+
+        }
+
+    });
+
+
+    container.innerHTML = html;
+
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+function searchMembers(){
+
+    const query =
+        document
+        .getElementById("searchInput")
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const results =
+        document
+        .getElementById("searchResults");
+
+
+    if(!query){
+
+        results.innerHTML = "";
+
+        return;
+
+    }
+
+
+    const found =
+        members.filter(member=>
+
+            (
+                member.full_name ||
+                ""
+            )
+            .toLowerCase()
+            .includes(query)
+
+        );
+
+
+    if(!found.length){
+
+        results.innerHTML = `
+
+        <div class="card">
+
+        No member found.
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    results.innerHTML =
+        found.map(member=>`
+
+        <div class="card">
+
+        <h3>
+        ${escapeHtml(
+            member.full_name
+        )}
+        </h3>
+
+        <p>
+        Gender:
+        ${escapeHtml(
+            member.gender || "-"
+        )}
+        </p>
+
+        <p>
+        Location:
+        ${escapeHtml(
+            member.location || "-"
+        )}
+        </p>
+
+        <div class="actions">
+
+        <button
+        class="secondary"
+        onclick="editMember('${member.id}')">
+        Edit
+        </button>
+
+        <button
+        class="danger"
+        onclick="deleteMember('${member.id}')">
+        Delete
+        </button>
+
+        </div>
+
+        </div>
+
+        `).join("");
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+function openPage(page,button){
+
+    document
+    .querySelectorAll(".page")
+    .forEach(p=>
+        p.classList.remove("active")
+    );
+
+
+    const target =
+        document.getElementById(page);
+
+
+    if(target){
+
+        target.classList.add("active");
+
+    }
+
+
+    document
+    .querySelectorAll(".sidebar button")
+    .forEach(b=>
+        b.classList.remove("active")
+    );
+
+
+    if(button){
+
+        button.classList.add("active");
+
+    }
+
+}
+
+
+/* =====================================================
+   LANGUAGE
+===================================================== */
+
+const translations = {
+
+    en:{
+        dashboard:"Dashboard",
+        tree:"My Family Tree",
+        members:"Members",
+        search:"Search",
+        settings:"Settings"
+    },
+
+    hi:{
+        dashboard:"डैशबोर्ड",
+        tree:"मेरा परिवार वृक्ष",
+        members:"सदस्य",
+        search:"खोजें",
+        settings:"सेटिंग्स"
+    },
+
+    ur:{
+        dashboard:"ڈیش بورڈ",
+        tree:"میرا خاندانی شجرہ",
+        members:"افراد",
+        search:"تلاش",
+        settings:"ترتیبات"
+    }
+
+};
+
+
+async function changeLanguage(){
+
+    currentLanguage =
+        document
+        .getElementById("languageSelect")
+        .value;
+
+
+    if(currentUser){
+
+        const {error} =
+            await supabaseClient
+            .from("profiles")
+            .upsert({
+
+                id:
+                    currentUser.id,
+
+                preferred_language:
+                    currentLanguage,
+
+                updated_at:
+                    new Date()
+                    .toISOString()
+
+            });
+
+
+        if(error){
+
+            console.error(error);
+
+        }
+
+    }
+
+
+    applyLanguage();
+
+}
+
+
+function applyLanguage(){
+
+    const t =
+        translations[
+            currentLanguage
+        ] ||
+        translations.en;
+
+
+    const buttons =
+        document
+        .querySelectorAll(
+            ".sidebar button"
+        );
+
+
+    if(buttons.length >= 5){
+
+        buttons[0].textContent =
+            "🏠 " + t.dashboard;
+
+        buttons[1].textContent =
+            "🌳 " + t.tree;
+
+        buttons[2].textContent =
+            "👨‍👩‍👧 " + t.members;
+
+        buttons[3].textContent =
+            "🔎 " + t.search;
+
+        buttons[4].textContent =
+            "⚙️ " + t.settings;
+
+    }
+
+
+    document
+    .getElementById("dashboardTitle")
+    .textContent =
+        t.dashboard;
+
+
+    document
+    .getElementById("treeTitle")
+    .textContent =
+        t.tree;
+
+
+    document
+    .getElementById("membersTitle")
+    .textContent =
+        t.members;
+
+
+    if(currentLanguage === "ur"){
+
+        document.body.dir = "rtl";
+
+    }else{
+
+        document.body.dir = "ltr";
+
+    }
+
+}
+
+
+/* =====================================================
+   MESSAGES
+===================================================== */
+
+function showAuthMessage(
+    text,
+    type
+){
+
+    const box =
+        document
+        .getElementById("authMessage");
+
+
+    box.textContent = text;
+
+    box.className =
+        type || "success";
+
+    box.style.display =
+        "block";
+
+}
+
+
+function clearAuthMessage(){
+
+    document
+    .getElementById("authMessage")
+    .style.display =
+        "none";
+
+}
+
+
+function showAppMessage(
+    text,
+    type
+){
+
+    const box =
+        document
+        .getElementById("appMessage");
+
+
+    box.textContent = text;
+
+    box.className =
+        type || "success";
+
+    box.style.display =
+        "block";
+
+}
+
+
+function clearAppMessage(){
+
+    document
+    .getElementById("appMessage")
+    .style.display =
+        "none";
+
+}
+
+
+/* =====================================================
+   SECURITY HELPER
+===================================================== */
+
+function escapeHtml(value){
+
+    if(
+        value === null ||
+        value === undefined
+    ){
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+checkSession();
 
 </script>
 
