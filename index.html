@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShamsiTree V4</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
+<title>ShamsiTree V4</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
 *{box-sizing:border-box}
 
 body{
@@ -342,28 +337,9 @@ th{background:#f7f9fc}
         display:none;
     }
 }
-</style>
-</head>
-
-<body>
-
-<!-- =====================================================
-     AUTH
-===================================================== -->
-
-<div id="authScreen">
-
-<div class="authBox">
-
-<div class="logo">🌳 <span>ShamsiTree</span></div>
-
-<div class="subtitle">
+</style></head><body><div id="authScreen"><div class="authBox"><div class="logo">🌳 <span>ShamsiTree</span></div><div class="subtitle">
 Family Tree • English • हिन्दी • اردو
-</div>
-
-<div class="tabs">
-
-<button id="loginTab"
+</div><div class="tabs"><button id="loginTab"
 class="active"
 onclick="showAuth('login')">
 Login
@@ -374,53 +350,24 @@ onclick="showAuth('register')">
 Register
 </button>
 
-</div>
-
-<div id="registerFields" style="display:none">
-
-<div class="field">
+</div><div id="registerFields" style="display:none"><div class="field">
 <label>Full Name</label>
 <input id="registerName" type="text">
-</div>
-
-</div>
-
-<div class="field">
+</div></div><div class="field">
 <label>Email</label>
 <input id="email" type="email" autocomplete="email">
-</div>
-
-<div class="field">
+</div><div class="field">
 <label>Password</label>
 <input id="password" type="password" autocomplete="current-password">
-</div>
-
-<button
+</div><button
 class="primary"
 id="authButton"
 onclick="submitAuth()">
 Login
 </button>
 
-<div id="authMessage"></div>
-
-</div>
-</div>
-
-
-<!-- =====================================================
-     APP
-===================================================== -->
-
-<div id="app">
-
-<header>
-
-<h1>🌳 ShamsiTree</h1>
-
-<div class="userArea">
-
-<span id="userEmail"></span>
+<div id="authMessage"></div></div>
+</div><div id="app"><header><h1>🌳 ShamsiTree</h1><div class="userArea"><span id="userEmail"></span>
 
 <button
 class="secondary"
@@ -428,176 +375,61 @@ onclick="logout()">
 Logout
 </button>
 
-</div>
-
-</header>
-
-
-<div class="layout">
-
-<aside class="sidebar">
-
-<button class="active"
+</div></header><div class="layout"><aside class="sidebar"><button class="active"
 onclick="openPage('dashboard',this)">
 🏠 Dashboard
 </button>
 
 <button onclick="openPage('tree',this)">
 🌳 My Tree
-</button>
-
-<button onclick="openPage('members',this)">
+</button><button onclick="openPage('members',this)">
 👨‍👩‍👧 Members
-</button>
-
-<button onclick="openPage('search',this)">
+</button><button onclick="openPage('search',this)">
 🔎 Search
-</button>
-
-<button onclick="openPage('settings',this)">
+</button><button onclick="openPage('settings',this)">
 ⚙️ Settings
-</button>
-
-</aside>
-
-
-<main class="content">
-
-<div id="appMessage"></div>
-
-
-<!-- ================= DASHBOARD ================= -->
-
-<section id="dashboard" class="page active">
-
-<h2 id="dashboardTitle">Dashboard</h2>
-
-<div class="cards">
-
-<div class="card">
+</button></aside><main class="content"><div id="appMessage"></div><section id="dashboard" class="page active"><h2 id="dashboardTitle">Dashboard</h2><div class="cards"><div class="card">
 <h3>My Family Tree</h3>
 <div class="big" id="treeName">-</div>
-</div>
-
-<div class="card">
+</div><div class="card">
 <h3>Family Members</h3>
 <div class="big" id="memberCount">0</div>
-</div>
-
-<div class="card">
+</div><div class="card">
 <h3>Connected Families</h3>
 <div class="big" id="connectionCount">0</div>
-</div>
-
-</div>
-
-<div class="card">
-
-<h3>Welcome to ShamsiTree 🌳</h3>
-
-<p id="welcomeText">
+</div></div><div class="card"><h3>Welcome to ShamsiTree 🌳</h3><p id="welcomeText">
 Build and manage your family history in one place.
-</p>
-
-</div>
-
-</section>
-
-
-<!-- ================= TREE ================= -->
-
-<section id="tree" class="page">
-
-<div class="topbar">
-
-<h2 id="treeTitle">My Family Tree</h2>
-
-<button
+</p></div></section><section id="tree" class="page"><div class="topbar"><h2 id="treeTitle">My Family Tree</h2><button
 class="primary"
 onclick="openMemberModal()">
+
 + Add Member
-</button>
+  </button>
 
-</div>
-
-<div
+</div><div
 class="treeBox"
 id="treeContainer">
 Loading...
-</div>
-
-</section>
-
-
-<!-- ================= MEMBERS ================= -->
-
-<section id="members" class="page">
-
-<div class="topbar">
-
-<h2 id="membersTitle">Members</h2>
-
-<button
+</div></section><section id="members" class="page"><div class="topbar"><h2 id="membersTitle">Members</h2><button
 class="primary"
 onclick="openMemberModal()">
+
 + Add Member
-</button>
+  </button>
 
-</div>
-
-<div class="tableWrap">
-
-<table>
-
-<thead>
-
-<tr>
+</div><div class="tableWrap"><table><thead><tr>
 <th>Name</th>
 <th>Gender</th>
 <th>Date of Birth</th>
 <th>Location</th>
 <th>Actions</th>
-</tr>
-
-</thead>
-
-<tbody id="membersTable"></tbody>
-
-</table>
-
-</div>
-
-</section>
-
-
-<!-- ================= SEARCH ================= -->
-
-<section id="search" class="page">
-
-<h2>🔎 Search Family Members</h2>
-
-<input
+</tr></thead><tbody id="membersTable"></tbody></table></div></section><section id="search" class="page"><h2>🔎 Search Family Members</h2><input
 class="search"
 id="searchInput"
 placeholder="Search member name..."
-oninput="searchMembers()">
+oninput="searchMembers">
 
-<div id="searchResults" style="margin-top:15px"></div>
-
-</section>
-
-
-<!-- ================= SETTINGS ================= -->
-
-<section id="settings" class="page">
-
-<h2>⚙️ Settings</h2>
-
-<div class="card">
-
-<div class="field">
-
-<label>Language</label>
+<div id="searchResults" style="margin-top:15px"></div></section><section id="settings" class="page"><h2>⚙️ Settings</h2><div class="card"><div class="field"><label>Language</label>
 
 <select
 id="languageSelect"
@@ -605,153 +437,52 @@ onchange="changeLanguage()">
 
 <option value="en">English</option>
 <option value="hi">हिन्दी</option>
-<option value="ur">اردو</option>
-
-</select>
-
+<option value="ur">اردو</option></select></div></div></section></main>
 </div>
-
-</div>
-
-</section>
-
-</main>
-</div>
-</div>
-
-
-<!-- =====================================================
-     MEMBER MODAL
-===================================================== -->
-
-<div class="modal" id="memberModal">
-
-<div class="modalBox">
-
-<h2 id="modalTitle">Add Family Member</h2>
-
-<input type="hidden" id="editMemberId">
-
-
-<div class="field">
-
-<label>Full Name</label>
+</div><div class="modal" id="memberModal"><div class="modalBox"><h2 id="modalTitle">Add Family Member</h2><input type="hidden" id="editMemberId"><div class="field"><label>Full Name</label>
 
 <input
 id="memberName"
 type="text"
 required>
 
-</div>
+</div><div class="field"><label>Gender</label>
 
-
-<div class="field">
-
-<label>Gender</label>
-
-<select id="memberGender">
-
-<option value="male">Male</option>
+<select id="memberGender"><option value="male">Male</option>
 <option value="female">Female</option>
-<option value="other">Other</option>
-
-</select>
-
-</div>
-
-
-<div class="field">
-
-<label>Date of Birth</label>
+<option value="other">Other</option></select></div><div class="field"><label>Date of Birth</label>
 
 <input
 id="memberDob"
 type="date">
 
-</div>
-
-
-<div class="field">
-
-<label>Phone</label>
+</div><div class="field"><label>Phone</label>
 
 <input
 id="memberPhone"
 type="tel">
 
-</div>
-
-
-<div class="field">
-
-<label>Location</label>
+</div><div class="field"><label>Location</label>
 
 <input
 id="memberLocation"
 type="text">
 
-</div>
+</div><div class="field"><label>Father</label>
 
-
-<!-- RELATIONSHIPS -->
-
-<div class="field">
-
-<label>Father</label>
-
-<select id="fatherId">
-
-<option value="">
+<select id="fatherId"><option value="">
 Select Father
-</option>
+</option></select></div><div class="field"><label>Mother</label>
 
-</select>
-
-</div>
-
-
-<div class="field">
-
-<label>Mother</label>
-
-<select id="motherId">
-
-<option value="">
+<select id="motherId"><option value="">
 Select Mother
-</option>
+</option></select></div><div class="field"><label>Husband / Wife</label>
 
-</select>
-
-</div>
-
-
-<div class="field">
-
-<label>Husband / Wife</label>
-
-<select id="spouseId">
-
-<option value="">
+<select id="spouseId"><option value="">
 Select Spouse
-</option>
+</option></select></div><div class="field"><label>Notes</label>
 
-</select>
-
-</div>
-
-
-<div class="field">
-
-<label>Notes</label>
-
-<textarea id="memberNotes"></textarea>
-
-</div>
-
-
-<div class="modalActions">
-
-<button
+<textarea id="memberNotes"></textarea></div><div class="modalActions"><button
 class="secondary"
 onclick="closeMemberModal()">
 Cancel
@@ -763,34 +494,18 @@ onclick="saveMember()">
 Save Member
 </button>
 
-</div>
-
-</div>
-</div>
-
-
-<!-- =====================================================
-     SCRIPT
-===================================================== -->
-
-<script>
+</div></div>
+</div><script>
 
 /* =====================================================
    SUPABASE CONFIGURATION
-=====================================================
-
-   IMPORTANT:
-   یہاں اپنی اصل Supabase URL اور Publishable Key
-   استعمال کریں۔
-
-   Secret / service_role key استعمال نہ کریں۔
 ===================================================== */
 
 const SUPABASE_URL =
-"PASTE_YOUR_SUPABASE_URL_HERE";
+"https://qhobvzbjbsbtmorllnjz.supabase.co";
 
 const SUPABASE_KEY =
-"PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+"sb_publishable_tRIMQFqiZu-tSRownnMMxQ_wjch-orJ";
 
 
 const supabaseClient =
@@ -1460,17 +1175,6 @@ async function saveRelationships(
     if(!currentTree) return;
 
 
-    /*
-       Parent relationship:
-       person -> father
-       person -> mother
-
-       Spouse:
-       person -> spouse
-       spouse -> person
-    */
-
-
     if(fatherId){
 
         await createRelationship(
@@ -1592,15 +1296,6 @@ function openMemberModal(member=null){
                 r.person_id === member.id &&
                 r.relation_type === "spouse"
             );
-
-
-        /*
-           We do not yet assume which parent is
-           father/mother from database alone.
-           The first parent is shown as father.
-           This can be improved later with a
-           dedicated relation_type if required.
-        */
 
 
         if(parents.length > 0){
@@ -1820,11 +1515,6 @@ async function saveMember(){
         }
 
 
-        /*
-           Save relationships separately.
-           This matches the database design.
-        */
-
         await saveRelationships(
             memberId,
             fatherId,
@@ -1884,13 +1574,6 @@ async function deleteMember(id){
 
 
     try{
-
-        /*
-           relationships are automatically deleted
-           by database cascade because they reference
-           family_members.
-        */
-
 
         const {error} =
             await supabaseClient
@@ -2072,10 +1755,6 @@ function renderTree(){
     }
 
 
-    /*
-       Build a simple relationship-aware tree.
-    */
-
     const childMap = {};
 
 
@@ -2091,11 +1770,6 @@ function renderTree(){
         r.relation_type === "parent"
     )
     .forEach(r=>{
-
-        /*
-           person_id = child
-           related_person_id = parent
-        */
 
         if(childMap[r.related_person_id]){
 
@@ -2255,10 +1929,6 @@ function renderTree(){
 
     });
 
-
-    /*
-       Add disconnected members.
-    */
 
     members.forEach(member=>{
 
@@ -2683,7 +2353,5 @@ function escapeHtml(value){
 
 checkSession();
 
-</script>
-
-</body>
+</script></body>
 </html>
