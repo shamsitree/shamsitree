@@ -1,7 +1,13 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ShamsiTree V3.2</title><style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ShamsiTree V3.3</title>
+
+<style>
 *{
     box-sizing:border-box;
 }
@@ -85,6 +91,15 @@ button:hover{
     opacity:.9;
 }
 
+input{
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:15px;
+}
+
 .status{
     margin-top:15px;
     padding:12px;
@@ -92,15 +107,45 @@ button:hover{
     background:#eef5ff;
 }
 
+.member-form{
+    display:none;
+    margin-top:15px;
+    padding:15px;
+    background:#f8f9fa;
+    border-radius:10px;
+}
+
+.member-list{
+    margin-top:15px;
+}
+
+.member-item{
+    background:#eef5ff;
+    padding:10px;
+    margin-top:8px;
+    border-radius:8px;
+}
+
 footer{
     text-align:center;
     padding:30px 20px;
     color:#666;
 }
-</style></head><body><header>
+</style>
+
+</head>
+
+<body>
+
+<header>
     <h1>🌳 ShamsiTree</h1>
     <p>Family Tree Project</p>
-</header><div class="container"><div class="welcome">
+</header>
+
+<div class="container">
+
+<div class="welcome">
+
     <h2>Welcome to ShamsiTree</h2>
 
     <p>
@@ -114,23 +159,48 @@ footer{
     <div class="status" id="connectionStatus">
         Checking Supabase connection...
     </div>
+
 </div>
+
 
 <div class="grid">
 
     <div class="card">
+
         <h3>👨‍👩‍👧 Family Members</h3>
 
         <p>
             Add and manage family members.
         </p>
 
-        <button onclick="showMessage('Family Members')">
+        <button onclick="openFamilyMembers()">
             Open
         </button>
+
+        <div class="member-form" id="memberForm">
+
+            <input
+                type="text"
+                id="memberName"
+                placeholder="Enter full name"
+            >
+
+            <button onclick="saveMember()">
+                💾 Save Member
+            </button>
+
+            <div
+                class="member-list"
+                id="memberList">
+            </div>
+
+        </div>
+
     </div>
 
+
     <div class="card">
+
         <h3>🌳 Family Tree</h3>
 
         <p>
@@ -140,9 +210,12 @@ footer{
         <button onclick="showMessage('Family Tree')">
             Open
         </button>
+
     </div>
 
+
     <div class="card">
+
         <h3>🔗 Family Connections</h3>
 
         <p>
@@ -152,9 +225,12 @@ footer{
         <button onclick="showMessage('Family Connections')">
             Open
         </button>
+
     </div>
 
+
     <div class="card">
+
         <h3>📊 Family Data</h3>
 
         <p>
@@ -164,9 +240,12 @@ footer{
         <button onclick="showMessage('Family Data')">
             Open
         </button>
+
     </div>
 
+
     <div class="card">
+
         <h3>🌐 Languages</h3>
 
         <p>
@@ -176,9 +255,12 @@ footer{
         <button onclick="showMessage('Languages')">
             Open
         </button>
+
     </div>
 
+
     <div class="card">
+
         <h3>⚙️ Settings</h3>
 
         <p>
@@ -188,13 +270,22 @@ footer{
         <button onclick="showMessage('Settings')">
             Open
         </button>
+
     </div>
 
 </div>
 
-</div><footer>
+</div>
+
+
+<footer>
     © 2026 ShamsiTree — Family Tree Project
-</footer><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
 
 const SUPABASE_URL =
     "https://qhobvzbjbsbtmorllnjz.supabase.co";
@@ -204,14 +295,26 @@ const SUPABASE_KEY =
 
 let supabaseClient = null;
 
+
+/* -----------------------------
+   STATUS
+----------------------------- */
+
 function updateStatus(message){
+
     const status =
         document.getElementById("connectionStatus");
 
     if(status){
         status.innerHTML = message;
     }
+
 }
+
+
+/* -----------------------------
+   SUPABASE CONNECTION
+----------------------------- */
 
 try{
 
@@ -254,7 +357,185 @@ try{
     updateStatus(
         "❌ Supabase connection error."
     );
+
 }
+
+
+/* -----------------------------
+   FAMILY MEMBERS
+----------------------------- */
+
+function openFamilyMembers(){
+
+    const form =
+        document.getElementById("memberForm");
+
+    if(form){
+
+        form.style.display =
+            form.style.display === "block"
+            ? "none"
+            : "block";
+
+    }
+
+}
+
+
+/* -----------------------------
+   SAVE MEMBER
+----------------------------- */
+
+async function saveMember(){
+
+    if(!supabaseClient){
+
+        alert(
+            "Supabase is not connected yet."
+        );
+
+        return;
+    }
+
+
+    const nameInput =
+        document.getElementById("memberName");
+
+    const name =
+        nameInput.value.trim();
+
+
+    if(!name){
+
+        alert(
+            "Please enter the family member's full name."
+        );
+
+        return;
+    }
+
+
+    try{
+
+        const { data, error } =
+            await supabaseClient
+                .from("family_members")
+                .insert([
+                    {
+                        full_name: name
+                    }
+                ])
+                .select();
+
+
+        if(error){
+
+            console.error(
+                "Save member error:",
+                error
+            );
+
+            alert(
+                "❌ Member could not be saved."
+            );
+
+            return;
+        }
+
+
+        alert(
+            "✅ Family member saved successfully."
+        );
+
+
+        nameInput.value = "";
+
+
+        loadMembers();
+
+
+    }catch(error){
+
+        console.error(
+            "Unexpected error:",
+            error
+        );
+
+        alert(
+            "❌ Something went wrong."
+        );
+
+    }
+
+}
+
+
+/* -----------------------------
+   LOAD MEMBERS
+----------------------------- */
+
+async function loadMembers(){
+
+    if(!supabaseClient){
+        return;
+    }
+
+
+    const list =
+        document.getElementById("memberList");
+
+
+    const { data, error } =
+        await supabaseClient
+            .from("family_members")
+            .select("id, full_name")
+            .order("full_name");
+
+
+    if(error){
+
+        console.error(
+            "Load members error:",
+            error
+        );
+
+        return;
+    }
+
+
+    list.innerHTML = "";
+
+
+    if(!data || data.length === 0){
+
+        list.innerHTML =
+            "<p>No family members added yet.</p>";
+
+        return;
+    }
+
+
+    data.forEach(member => {
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "member-item";
+
+        item.textContent =
+            "👤 " + member.full_name;
+
+        list.appendChild(item);
+
+    });
+
+}
+
+
+/* -----------------------------
+   OTHER SECTIONS
+----------------------------- */
 
 function showMessage(section){
 
@@ -265,5 +546,7 @@ function showMessage(section){
 
 }
 
-</script></body>
+</script>
+
+</body>
 </html>
