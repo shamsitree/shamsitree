@@ -124,6 +124,21 @@ async function loadTree(){
     }
    }
   }
+  // Final recovery for older records: if the member rows are visible to this
+  // logged-in user but their tree is not in the owner_user_id list, locate the
+  // tree from the member's created_by value before creating a new empty tree.
+  if((!chosenTree||bestCount<=0)){
+   const legacy=await supabaseClient.from('family_members').select('tree_id,created_by').eq('created_by',currentUser.id);
+   if(!legacy.error&&Array.isArray(legacy.data)&&legacy.data.length){
+    const counts={};
+    legacy.data.forEach(x=>{if(x.tree_id)counts[x.tree_id]=(counts[x.tree_id]||0)+1});
+    const ids=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+    for(const id of ids){
+     const tr=await supabaseClient.from('family_trees').select('*').eq('id',id).maybeSingle();
+     if(!tr.error&&tr.data){chosenTree=tr.data;bestCount=counts[id];break}
+    }
+   }
+  }
   if(!trees.length){
    const r=await supabaseClient.from('family_trees').insert({owner_user_id:currentUser.id,name:'My Family Tree'}).select().single();
    if(r.error)throw r.error;
