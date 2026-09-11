@@ -93,7 +93,50 @@ async function startApp(session){if(!session?.user)return showAuthScreen();curre
 function showAuthScreen(){authScreen.style.display='flex';app.style.display='none'}
 async function logout(){await supabaseClient.auth.signOut();currentUser=null;currentTree=null;members=[];relationships=[];showAuthScreen()}
 async function loadProfile(){if(!currentUser)return;const {data}=await supabaseClient.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();if(data){currentLanguage=data.preferred_language||'en';languageSelect.value=currentLanguage;applyLanguage()}}
-async function loadTree(){if(!currentUser)return;let {data:trees,error}=await supabaseClient.from('family_trees').select('*').eq('owner_user_id',currentUser.id).order('created_at',{ascending:true});if(error){console.error(error);return showAppMessage('Could not load family tree: '+error.message,'error')}if(!trees||!trees.length){let r=await supabaseClient.from('family_trees').insert({owner_user_id:currentUser.id,name:'My Family Tree'}).select().single();if(r.error)return showAppMessage('Could not create family tree: '+r.error.message,'error');trees=[r.data]}let chosenTree=null;let bestCount=0;for(const tree of trees){const r=await supabaseClient.from('family_members').select('id',{count:'exact',head:true}).eq('tree_id',tree.id);if(!r.error&&(r.count||0)>bestCount){bestCount=r.count||0;chosenTree=tree}}if(!chosenTree){for(const tree of trees){const r=await supabaseClient.from('family_members').select('id').eq('tree_id',tree.id).limit(1);if(!r.error&&Array.isArray(r.data)&&r.data.length){chosenTree=tree;break}}}currentTree=chosenTree||trees[0];updateTreeInformation();await loadMembers()}
+async function loadTree(){
+ if(!currentUser)return;
+ try{
+  let {data:trees,error}=await supabaseClient.from('family_trees').select('*').eq('owner_user_id',currentUser.id).order('created_at',{ascending:true});
+  if(error){console.error('family_trees load error',error);return showAppMessage('Could not load family tree: '+error.message,'error')}
+  trees=trees||[];
+  let chosenTree=null,bestCount=-1;
+  // Always inspect the actual member rows instead of relying only on a count/head query.
+  // This also makes older trees recoverable when there are multiple family_trees rows.
+  for(const tree of trees){
+   const r=await supabaseClient.from('family_members').select('id').eq('tree_id',tree.id);
+   if(r.error){console.error('family_members check failed for tree',tree.id,r.error);continue}
+   const count=Array.isArray(r.data)?r.data.length:0;
+   if(count>bestCount){bestCount=count;chosenTree=tree}
+  }
+  // Safety fallback for older data where the tree owner row may differ but members
+  // were created by the currently logged-in user.
+  if(!chosenTree||bestCount<=0){
+   const mine=await supabaseClient.from('family_members').select('tree_id').eq('created_by',currentUser.id);
+   if(!mine.error&&Array.isArray(mine.data)&&mine.data.length){
+    const counts={};
+    mine.data.forEach(x=>{if(x.tree_id)counts[x.tree_id]=(counts[x.tree_id]||0)+1});
+    const ids=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+    for(const id of ids){
+     const existing=trees.find(t=>t.id===id);
+     if(existing){chosenTree=existing;bestCount=counts[id];break}
+     const tr=await supabaseClient.from('family_trees').select('*').eq('id',id).maybeSingle();
+     if(!tr.error&&tr.data){chosenTree=tr.data;bestCount=counts[id];break}
+    }
+   }
+  }
+  if(!trees.length){
+   const r=await supabaseClient.from('family_trees').insert({owner_user_id:currentUser.id,name:'My Family Tree'}).select().single();
+   if(r.error)throw r.error;
+   trees=[r.data];chosenTree=r.data;bestCount=0;
+  }
+  currentTree=chosenTree||trees[0];
+  updateTreeInformation();
+  await loadMembers();
+ }catch(e){
+  console.error('loadTree failed',e);
+  showAppMessage('Could not load family tree: '+(e.message||e),'error');
+ }
+}
 function updateTreeInformation(){const name=currentTree?.name||'My Family Tree',code=currentTree?.tree_code||'Not assigned';treeName.textContent=name;dashboardTreeCode.textContent='Tree ID: '+code;treePageCode.textContent='Tree ID: '+code}
 async function loadMembers(){if(!currentTree)return;const {data,error}=await supabaseClient.from('family_members').select('*').eq('tree_id',currentTree.id).order('full_name',{ascending:true});if(error)return showAppMessage('Could not load members: '+error.message,'error');members=data||[];await loadRelationships();renderMembers();renderTree();memberCount.textContent=members.length}
 async function loadRelationships(){if(!currentTree){relationships=[];return}const {data,error}=await supabaseClient.from('relationships').select('*').eq('tree_id',currentTree.id);if(error){console.error(error);relationships=[];return}relationships=data||[]}
