@@ -30,7 +30,7 @@
 </div></div>
 
 <div id="app">
-<header><h1>🌳 ShamsiTree <span class="small">Main 7.3</span></h1><div class="userArea"><span id="userEmail"></span><button class="secondary" onclick="logout()">Logout</button></div></header>
+<header><h1>🌳 ShamsiTree <span class="small">Main 7.4</span></h1><div class="userArea"><span id="userEmail"></span><button class="secondary" onclick="logout()">Logout</button></div></header>
 <div class="layout"><aside class="sidebar">
   <button class="active" onclick="openPage('dashboard',this)">🏠 Dashboard</button>
   <button onclick="openPage('tree',this)">🌳 My Tree</button>
@@ -361,12 +361,46 @@ function hydrateBuilderPerson(id,seen=new Set(),depth=0){
 }
 
 
+function chooseBuilderRootMember(){
+ if(!members.length)return null;
+ const byId=new Map(members.map(m=>[m.id,m]));
+ const parentSet=new Set(),childSet=new Set(),spouseSet=new Set();
+ relationships.forEach(r=>{
+   if(!r||!r.person_id||!r.related_person_id)return;
+   if(r.relation_type==='parent'){parentSet.add(r.person_id);childSet.add(r.related_person_id)}
+   if(r.relation_type==='spouse'){spouseSet.add(r.person_id);spouseSet.add(r.related_person_id)}
+ });
+ const createdByMe=m=>currentUser&&m.created_by===currentUser.id;
+ const score=m=>{
+   const hasParents=parentSet.has(m.id);
+   const hasChildren=childSet.has(m.id);
+   const hasSpouse=spouseSet.has(m.id);
+   let score=0;
+   if(createdByMe(m))score+=12;
+   if(hasParents)score+=4;
+   if(hasChildren)score+=8;
+   if(hasSpouse)score+=5;
+   // A likely Form B center has both an upward and downward path.
+   if(hasParents&&hasChildren)score+=12;
+   if(hasChildren&&!hasParents)score+=3;
+   return score;
+ };
+ const ranked=[...members].sort((a,b)=>score(b)-score(a)||(createdByMe(b)?1:0)-(createdByMe(a)?1:0)||(a.created_at||'').localeCompare(b.created_at||''));
+ const best=ranked[0]||null;
+ // Do not auto-pick an arbitrary person from an unrelated multi-member tree.
+ // Prefer a clear graph center; otherwise use the user's own member when there is one.
+ const bestScore=best?score(best):0;
+ if(best&&bestScore>=12)return best;
+ const mine=members.filter(createdByMe);
+ if(mine.length===1)return mine[0];
+ if(members.length===1)return members[0];
+ return null;
+}
+
 async function openTreeBuilder(){
  builderDesign=localStorage.getItem('shamsitree_builder_design_'+(currentUser?.id||''))||'classic';
  builderRegistry={};
- let mainMember=null;
- if(currentUser){const mine=members.filter(m=>m.created_by===currentUser.id);if(mine.length===1)mainMember=mine[0]||null}
- if(!mainMember&&members.length===1)mainMember=members[0]||null;
+ const mainMember=chooseBuilderRootMember();
  treeBuilder={main:mainMember?hydrateBuilderPerson(mainMember.id):null};
  renderTreeBuilder();
  document.getElementById('treeBuilderModal').style.display='block'
