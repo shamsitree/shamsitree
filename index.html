@@ -245,9 +245,33 @@ function renderMainSection(){const p=treeBuilder.main;if(!p)return '<div class="
 function renderTreeBuilder(){builderRegistry={};const c=document.getElementById('treeBuilderContent');c.innerHTML='<div class="builderToolbar"><div><b>Two-Way Tree</b><div class="builderToolbarText">Father side goes upward • Children go downward • Each spouse keeps a separate children branch</div></div><div class="builderDesigns"><button class="designBtn '+(builderDesign==='classic'?'selected':'')+'" onclick="setBuilderDesign(\'classic\')">Classic</button><button class="designBtn '+(builderDesign==='heritage'?'selected':'')+'" onclick="setBuilderDesign(\'heritage\')">Heritage</button><button class="designBtn '+(builderDesign==='soft'?'selected':'')+'" onclick="setBuilderDesign(\'soft\')">Family Album</button><button class="secondary" onclick="printBuilderTree()">🖨 Print Tree</button></div></div><div id="builderPrintable" class="builderCanvas design-'+builderDesign+'">'+renderAncestorSection()+renderMainSection()+'</div>'}
 function setBuilderDesign(d){builderDesign=d;localStorage.setItem('shamsitree_builder_design_'+(currentUser?.id||''),d);renderTreeBuilder()}
 function builderPersonFromMember(m){if(!m)return null;return {name:m.full_name||'',gender:m.gender||'other',date_of_birth:m.date_of_birth||'',date_of_death:m.date_of_death||'',birthplace:m.birthplace||'',current_residence:m.current_residence||m.location||'',phone:m.phone||'',biradari:m.biradari||'Shamsi',notes:m.notes||'',profile_photo:m.profile_photo||'',existingId:m.id,personId:m.id,photo_file:null,father:null,spouses:[],children:[],spouse_role:''}}
-function spouseIdsForBuilder(id){return relationships.filter(r=>r.relation_type==='spouse'&&(r.person_id===id||r.related_person_id===id)).map(r=>r.person_id===id?r.related_person_id:r.person_id).filter(Boolean)}
+function spouseIdsForBuilder(id){
+ const ids=[];
+ relationships.filter(r=>r.relation_type==='spouse'&&(r.person_id===id||r.related_person_id===id)).forEach(r=>{const sid=r.person_id===id?r.related_person_id:r.person_id;if(sid&&sid!==id&&!ids.includes(sid))ids.push(sid)});
+ // Robust fallback: if spouse relationship was not saved, find the other parent of this person's children.
+ // This lets an existing family (Kamal + Ruhi + Abdul ghani) reconstruct correctly after reload.
+ childIdsForBuilder(id).forEach(cid=>{
+   relationships.filter(r=>r.relation_type==='parent'&&r.person_id===cid&&r.related_person_id!==id).forEach(r=>{const sid=r.related_person_id;if(sid&&sid!==id&&!ids.includes(sid))ids.push(sid)})
+ });
+ return ids;
+}
 function childIdsForBuilder(id){return relationships.filter(r=>r.relation_type==='parent'&&r.related_person_id===id).map(r=>r.person_id).filter(Boolean)}
-function hydrateBuilderPerson(id,seen=new Set(),depth=0){if(!id||seen.has(id)||depth>30)return null;const m=members.find(x=>x.id===id);if(!m)return null;seen.add(id);const p=builderPersonFromMember(m);const parents=relationships.filter(r=>r.relation_type==='parent'&&r.person_id===id).map(r=>members.find(x=>x.id===r.related_person_id)).filter(Boolean);const father=parents.find(x=>x.gender==='male');p.father=father?hydrateBuilderPerson(father.id,new Set(seen),depth+1):null;const spouseIds=spouseIdsForBuilder(id);p.spouses=spouseIds.map(sid=>{const sp=hydrateBuilderPerson(sid,new Set(seen),depth+1);if(sp)sp.spouse_role=(sp.gender==='male'?'Husband':'Wife');return sp}).filter(Boolean).slice(0,3);const spouseChildIds=new Set(spouseIds.flatMap(sid=>childIdsForBuilder(sid)));const directChildIds=childIdsForBuilder(id).filter(cid=>!spouseChildIds.has(cid));p.children=directChildIds.map(cid=>hydrateBuilderPerson(cid,new Set(seen),depth+1)).filter(Boolean);p.spouses.forEach((sp,i)=>{const sid=spouseIds[i];sp.children=childIdsForBuilder(sid).map(cid=>hydrateBuilderPerson(cid,new Set(seen),depth+1)).filter(Boolean)});return p}
+function hydrateBuilderPerson(id,seen=new Set(),depth=0){
+ if(!id||seen.has(id)||depth>30)return null;
+ const m=members.find(x=>x.id===id);if(!m)return null;
+ seen.add(id);
+ const p=builderPersonFromMember(m);
+ const parents=relationships.filter(r=>r.relation_type==='parent'&&r.person_id===id).map(r=>members.find(x=>x.id===r.related_person_id)).filter(Boolean);
+ const father=parents.find(x=>x.gender==='male');
+ p.father=father?hydrateBuilderPerson(father.id,new Set(seen),depth+1):null;
+ const spouseIds=spouseIdsForBuilder(id);
+ p.spouses=spouseIds.map(sid=>{const sp=hydrateBuilderPerson(sid,new Set(seen),depth+1);if(sp)sp.spouse_role=(sp.gender==='male'?'Husband':'Wife');return sp}).filter(Boolean).slice(0,3);
+ const spouseChildIds=new Set(spouseIds.flatMap(sid=>childIdsForBuilder(sid)));
+ const directChildIds=childIdsForBuilder(id).filter(cid=>!spouseChildIds.has(cid));
+ p.children=directChildIds.map(cid=>hydrateBuilderPerson(cid,new Set(seen),depth+1)).filter(Boolean);
+ p.spouses.forEach((sp,i)=>{const sid=spouseIds[i];sp.children=childIdsForBuilder(sid).map(cid=>hydrateBuilderPerson(cid,new Set(seen),depth+1)).filter(Boolean)});
+ return p;
+}
 function openTreeBuilder(){builderDesign=localStorage.getItem('shamsitree_builder_design_'+(currentUser?.id||''))||'classic';builderRegistry={};let mainMember=null;if(currentUser){const mine=members.filter(m=>m.created_by===currentUser.id);mainMember=mine.find(m=>/^(kamal anwer|anwer kamal)$/i.test((m.full_name||'').trim()))||null;if(!mainMember&&mine.length===1)mainMember=mine[0]||null}if(!mainMember)mainMember=members.find(m=>/^(kamal anwer|anwer kamal)$/i.test((m.full_name||'').trim()))||null;if(!mainMember&&members.length===1)mainMember=members[0]||null;treeBuilder={main:mainMember?hydrateBuilderPerson(mainMember.id):null};renderTreeBuilder();document.getElementById('treeBuilderModal').style.display='block'}
 function closeTreeBuilder(){document.getElementById('treeBuilderModal').style.display='none';closeBuilderForm()}
 function addBuilderFather(){if(!treeBuilder.main)return openBuilderForm('main');let target=treeBuilder.main;while(target.father)target=target.father;openBuilderForm('father',{owner:target})}
