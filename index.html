@@ -287,28 +287,13 @@ function spouseIdsForBuilder(id){
    const sm=members.find(x=>x.id===sid);
    if(sm)ids.push(sid);
  };
- // 1) Use explicit spouse relationships first.
- relationships.filter(r=>r.relation_type==='spouse'&&(r.person_id===id||r.related_person_id===id))
+ // Spouse status must come from an explicit spouse relationship.
+ // A shared child alone does NOT prove that two people are spouses: for example,
+ // Form A stores Father and Mother as two parent records of the child, and that
+ // must never make either parent appear as the child's spouse.
+ relationships
+   .filter(r=>r.relation_type==='spouse'&&(r.person_id===id||r.related_person_id===id))
    .forEach(r=>add(r.person_id===id?r.related_person_id:r.person_id));
-
- // 2) Strong fallback: inspect BOTH parent records for every child of this person.
- // The database model stores: child(person_id) -> parent(related_person_id).
- // Therefore, if Kamal and Ruhi are both parents of Abdul ghani, Ruhi is Kamal's spouse
- // even if an explicit spouse row was never created.
- childIdsForBuilder(id).forEach(cid=>{
-   relationships.filter(r=>r.relation_type==='parent'&&r.person_id===cid)
-     .forEach(r=>{ if(r.related_person_id!==id) add(r.related_person_id); });
- });
-
- // 3) Also support installations where a parent row was stored in the opposite
- // direction by looking for a person who shares children with this person.
- relationships.filter(r=>r.relation_type==='parent'&&r.related_person_id===id)
-   .forEach(r=>{
-     const childId=r.person_id;
-     relationships.filter(x=>x.relation_type==='parent'&&x.person_id===childId&&x.related_person_id!==id)
-       .forEach(x=>add(x.related_person_id));
-   });
-
  return ids;
 }
 function childIdsForBuilder(id){
