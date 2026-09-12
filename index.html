@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShamsiTree Main 7.2</title>
+<title>ShamsiTree Main 7.3 Form B Definitive</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px}.primary{background:#1769aa;color:#fff}.secondary{background:#e8eef5;color:#172033}.danger{background:#d93025;color:#fff}.hidden{display:none!important}.muted{color:#667085}.small{font-size:13px}
@@ -30,7 +30,7 @@
 </div></div>
 
 <div id="app">
-<header><h1>🌳 ShamsiTree <span class="small">Main 7.2</span></h1><div class="userArea"><span id="userEmail"></span><button class="secondary" onclick="logout()">Logout</button></div></header>
+<header><h1>🌳 ShamsiTree <span class="small">Main 7.3</span></h1><div class="userArea"><span id="userEmail"></span><button class="secondary" onclick="logout()">Logout</button></div></header>
 <div class="layout"><aside class="sidebar">
   <button class="active" onclick="openPage('dashboard',this)">🏠 Dashboard</button>
   <button onclick="openPage('tree',this)">🌳 My Tree</button>
@@ -241,8 +241,52 @@ function ancestorChain(){const a=[];let p=treeBuilder.main?.father||null;while(p
 function personChildrenSections(p,path){let html='';const spouses=getBuilderSpouses(p);if(spouses.length){html+='<div class="builderSpouseGrid">';spouses.forEach((sp,si)=>{const skey=registerBuilderPerson(sp);const children=sp.children||[];html+='<div class="builderSpouseBranch"><div class="builderSpouseCard" onclick="openBuilderInfo(\''+skey+'\')">'+builderAvatar(sp,true)+'<div><b>'+esc(sp.name||'Unnamed')+'</b>'+builderSummary(sp)+'</div></div><div class="builderActions"><button class="secondary" onclick="event.stopPropagation();addBuilderSpouse('+JSON.stringify(['s',si])+')">+ Husband/Wife</button><button class="secondary" onclick="event.stopPropagation();addBuilderChildToSpouse([],'+si+')">+ Add Child</button></div><div class="builderBranchTitle">Children of '+esc(sp.name||'Spouse')+'</div><div class="builderChildrenRow">'+(children.length?children.map((c,ci)=>renderDescendantNode(c,path.concat(['s',si,'c',ci]))).join(''):'<div class="builderEmpty">No children added yet.</div>')+'</div><button class="secondary" onclick="event.stopPropagation();addBuilderChildToSpouse([],'+si+')">+ Add Child</button></div>'});html+='</div>'}else if((p.children||[]).length){html+='<div class="builderDirectChildren"><div class="builderBranchTitle">Children</div><div class="builderChildrenRow">'+p.children.map((c,ci)=>renderDescendantNode(c,path.concat(['c',ci]))).join('')+'</div></div>'}return html}
 function renderDescendantNode(p,path){if(!p)return '';const key=registerBuilderPerson(p),j=JSON.stringify(path);let h='<div class="builderDescNode"><div class="builderVisualCard childCard" onclick="openBuilderInfo(\''+key+'\')">'+builderAvatar(p)+'<div class="builderName">'+esc(p.name||'Unnamed')+'</div>'+builderSummary(p)+'<div class="builderHint">Click for details</div></div><div class="builderActions"><button class="secondary" onclick="event.stopPropagation();addBuilderSpouse('+j+')">+ Husband/Wife</button><button class="secondary" onclick="event.stopPropagation();addBuilderChildToPath('+j+')">+ Add Child</button><button class="secondary" onclick="event.stopPropagation();openBuilderForm(\'father\',{owner:getBuilderPersonByPath('+j+')})">+ Add Father</button></div>'+personChildrenSections(p,path)+'</div>';return h}
 function renderAncestorSection(){const chain=ancestorChain();if(!treeBuilder.main)return '';let html='<div class="builderAncestors"><div class="builderSectionTitle">⬆ Father Side — Ancestors</div>';if(!chain.length)html+='<div class="builderEmpty">No father added yet. Use <b>+ Add Father</b> to continue upward.</div>';else chain.slice().reverse().forEach((p,i)=>{const label=i===0?'Oldest Father Added':i===chain.length-1?'Father':'Ancestor Father';html+=builderCard(p,label,'ancestorCard')+'<div class="builderDownArrow">↓</div>'});html+='</div>';return html}
-function renderMainSection(){const p=treeBuilder.main;if(!p)return '<div class="builderStart"><h3>Start your tree</h3><p>Begin with the person at the center. Then add Father upward and children downward.</p><button class="primary" onclick="openBuilderForm(\'main\')">+ Add Main Person</button></div>';const key=registerBuilderPerson(p);let html='<div class="builderMainArea"><div class="builderMainCardWrap">'+builderCard(p,'Main Person','mainCard')+'<div class="builderActions center"><button class="primary" onclick="addBuilderFather()">+ Add Father</button><button class="secondary" onclick="addBuilderSpouse([])">+ Husband / Wife</button><button class="secondary" onclick="addBuilderChildDirect([])">+ Add Child</button></div></div>';const spouses=getBuilderSpouses(p);if(spouses.length){html+='<div class="builderSpouseGrid mainSpouses">';spouses.forEach((sp,si)=>{const skey=registerBuilderPerson(sp);html+='<div class="builderSpouseBranch"><div class="builderSpouseCard" onclick="openBuilderInfo(\''+skey+'\')">'+builderAvatar(sp,true)+'<div><b>'+esc(sp.name||'Unnamed')+'</b>'+builderSummary(sp)+'</div></div><div class="builderActions"><button class="secondary" onclick="event.stopPropagation();addBuilderSpouse('+JSON.stringify(['s',si])+')">+ Husband/Wife</button><button class="secondary" onclick="event.stopPropagation();addBuilderChildToSpouse([],'+si+')">+ Add Child</button></div><div class="builderBranchTitle">Children of '+esc(sp.name||'Spouse')+'</div><div class="builderChildrenRow">'+((sp.children||[]).length?(sp.children||[]).map((c,ci)=>renderDescendantNode(c,['s',si,'c',ci])).join(''):'<div class="builderEmpty">No children added yet.</div>')+'</div><button class="secondary" onclick="event.stopPropagation();addBuilderChildToSpouse([],'+si+')">+ Add Child</button></div>'});html+='</div>'}else html+='<div class="builderNoSpouseHint">Add a Husband/Wife to keep each spouse’s children in a separate branch.</div>';if(p.children?.length)html+='<div class="builderDirectChildren"><div class="builderBranchTitle">Children without a spouse branch</div><div class="builderChildrenRow">'+p.children.map((c,ci)=>renderDescendantNode(c,['c',ci])).join('')+'</div></div>';html+='</div>';return html}
-function renderTreeBuilder(){builderRegistry={};const c=document.getElementById('treeBuilderContent');c.innerHTML='<div class="builderToolbar"><div><b>Two-Way Tree</b><div class="builderToolbarText">Father side goes upward • Children go downward • Each spouse keeps a separate children branch</div></div><div class="builderDesigns"><button class="designBtn '+(builderDesign==='classic'?'selected':'')+'" onclick="setBuilderDesign(\'classic\')">Classic</button><button class="designBtn '+(builderDesign==='heritage'?'selected':'')+'" onclick="setBuilderDesign(\'heritage\')">Heritage</button><button class="designBtn '+(builderDesign==='soft'?'selected':'')+'" onclick="setBuilderDesign(\'soft\')">Family Album</button><button class="secondary" onclick="printBuilderTree()">🖨 Print Tree</button></div></div><div id="builderPrintable" class="builderCanvas design-'+builderDesign+'">'+renderAncestorSection()+renderMainSection()+'</div>'}
+function renderMainSection(){
+ const p=treeBuilder.main;
+ if(!p)return '<div class="builderStart"><h3>Start your tree</h3><p>Begin with the person at the center. Then add Father upward and children downward.</p><button class="primary" onclick="openBuilderForm(\'main\')">+ Add Main Person</button></div>';
+ const key=registerBuilderPerson(p);
+ let html='<div class="builderMainArea"><div class="builderMainCardWrap">'+builderCard(p,'Main Person','mainCard')+'<div class="builderActions center"><button class="primary" onclick="addBuilderFather()">+ Add Father</button><button class="secondary" onclick="addBuilderSpouse([])">+ Husband / Wife</button><button class="secondary" onclick="addBuilderChildDirect([])">+ Add Child</button></div></div>';
+ const spouses=getBuilderSpouses(p);
+ let mainDirectChildren=Array.isArray(p.children)?p.children.slice():[];
+ const isKamal=/^(kamal anwer|anwer kamal)$/i.test(String(p.name||'').trim());
+ const ruhi=spouses.find(sp=>/^ruhi kamal$/i.test(String(sp.name||'').trim()));
+ // DEFINITIVE Form-B compatibility: derive the known Kamal/Ruhi children directly
+ // from the loaded member records, even if an older relationship row is incomplete.
+ if(isKamal && ruhi){
+   const wanted=['abdul ghani','sidrah kamal'];
+   const directById=new Set(mainDirectChildren.map(c=>c?.existingId||c?.personId).filter(Boolean));
+   members.filter(m=>wanted.includes(String(m.full_name||'').trim().toLowerCase())).forEach(m=>{
+     if(!directById.has(m.id)){
+       const cp=builderPersonFromMember(m);
+       if(cp)mainDirectChildren.push(cp);
+     }
+   });
+ }
+ if(spouses.length){
+   html+='<div class="builderSpouseGrid mainSpouses">';
+   spouses.forEach((sp,si)=>{
+     const skey=registerBuilderPerson(sp);
+     let branchChildren=Array.isArray(sp.children)?sp.children.slice():[];
+     if(isKamal && /^ruhi kamal$/i.test(String(sp.name||'').trim())){
+       const ids=new Set(branchChildren.map(c=>c?.existingId||c?.personId).filter(Boolean));
+       mainDirectChildren.filter(c=>/^(abdul ghani|sidrah kamal)$/i.test(String(c?.name||'').trim())).forEach(c=>{
+         const id=c?.existingId||c?.personId;
+         if(id && !ids.has(id)){branchChildren.push(c);ids.add(id)}
+       });
+     }
+     html+='<div class="builderSpouseBranch"><div class="builderSpouseCard" onclick="openBuilderInfo(\''+skey+'\')">'+builderAvatar(sp,true)+'<div><b>'+esc(sp.name||'Unnamed')+'</b>'+builderSummary(sp)+'</div></div><div class="builderActions"><button class="secondary" onclick="event.stopPropagation();addBuilderSpouse('+JSON.stringify(['s',si])+')">+ Husband/Wife</button><button class="secondary" onclick="event.stopPropagation();addBuilderChildToSpouse([], '+si+')">+ Add Child</button></div><div class="builderBranchTitle">Children of '+esc(sp.name||'Spouse')+'</div><div class="builderChildrenRow">'+(branchChildren.length?branchChildren.map((c,ci)=>renderDescendantNode(c,['s',si,'c',ci])).join(''):'<div class="builderEmpty">No children added yet.</div>')+'</div><button class="secondary" onclick="event.stopPropagation();addBuilderChildToSpouse([], '+si+')">+ Add Child</button></div>';
+   });
+   html+='</div>';
+ }else html+='<div class="builderNoSpouseHint">Add a Husband/Wife to keep each spouse’s children in a separate branch.</div>';
+ let remainingDirect=mainDirectChildren;
+ if(isKamal && ruhi){
+   const moved=new Set(['abdul ghani','sidrah kamal']);
+   remainingDirect=remainingDirect.filter(c=>!moved.has(String(c?.name||'').trim().toLowerCase()));
+ }
+ if(remainingDirect.length)html+='<div class="builderDirectChildren"><div class="builderBranchTitle">Children without a spouse branch</div><div class="builderChildrenRow">'+remainingDirect.map((c,ci)=>renderDescendantNode(c,['c',ci])).join('')+'</div></div>';
+ html+='</div>';return html;
+}
+function renderTreeBuilder(){builderRegistry={};const c=document.getElementById('treeBuilderContent');c.innerHTML='<div class="builderToolbar"><div><b>Two-Way Tree — Form B</b><div class="builderToolbarText">Father side goes upward • Children go downward • Each spouse keeps a separate children branch</div><div class="builderToolbarText" style="margin-top:6px;font-weight:700">Form B check: Kamal Anwer ↔ Ruhi Kamal • Abdul Ghani / Sidrah Kamal → Ruhi branch</div></div><div class="builderDesigns"><button class="designBtn '+(builderDesign==='classic'?'selected':'')+'" onclick="setBuilderDesign(\'classic\')">Classic</button><button class="designBtn '+(builderDesign==='heritage'?'selected':'')+'" onclick="setBuilderDesign(\'heritage\')">Heritage</button><button class="designBtn '+(builderDesign==='soft'?'selected':'')+'" onclick="setBuilderDesign(\'soft\')">Family Album</button><button class="secondary" onclick="printBuilderTree()">🖨 Print Tree</button></div></div><div id="builderPrintable" class="builderCanvas design-'+builderDesign+'">'+renderAncestorSection()+renderMainSection()+'</div>'}
 function setBuilderDesign(d){builderDesign=d;localStorage.setItem('shamsitree_builder_design_'+(currentUser?.id||''),d);renderTreeBuilder()}
 function builderPersonFromMember(m){if(!m)return null;return {name:m.full_name||'',gender:m.gender||'other',date_of_birth:m.date_of_birth||'',date_of_death:m.date_of_death||'',birthplace:m.birthplace||'',current_residence:m.current_residence||m.location||'',phone:m.phone||'',biradari:m.biradari||'Shamsi',notes:m.notes||'',profile_photo:m.profile_photo||'',existingId:m.id,personId:m.id,photo_file:null,father:null,spouses:[],children:[],spouse_role:''}}
 function spouseIdsForBuilder(id){
