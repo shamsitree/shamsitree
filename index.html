@@ -247,32 +247,103 @@ function setBuilderDesign(d){builderDesign=d;localStorage.setItem('shamsitree_bu
 function builderPersonFromMember(m){if(!m)return null;return {name:m.full_name||'',gender:m.gender||'other',date_of_birth:m.date_of_birth||'',date_of_death:m.date_of_death||'',birthplace:m.birthplace||'',current_residence:m.current_residence||m.location||'',phone:m.phone||'',biradari:m.biradari||'Shamsi',notes:m.notes||'',profile_photo:m.profile_photo||'',existingId:m.id,personId:m.id,photo_file:null,father:null,spouses:[],children:[],spouse_role:''}}
 function spouseIdsForBuilder(id){
  const ids=[];
- relationships.filter(r=>r.relation_type==='spouse'&&(r.person_id===id||r.related_person_id===id)).forEach(r=>{const sid=r.person_id===id?r.related_person_id:r.person_id;if(sid&&sid!==id&&!ids.includes(sid))ids.push(sid)});
- // Robust fallback: if spouse relationship was not saved, find the other parent of this person's children.
- // This lets an existing family (Kamal + Ruhi + Abdul ghani) reconstruct correctly after reload.
+ const add=(sid)=>{
+   if(!sid||sid===id||ids.includes(sid))return;
+   const sm=members.find(x=>x.id===sid);
+   if(sm)ids.push(sid);
+ };
+ // 1) Use explicit spouse relationships first.
+ relationships.filter(r=>r.relation_type==='spouse'&&(r.person_id===id||r.related_person_id===id))
+   .forEach(r=>add(r.person_id===id?r.related_person_id:r.person_id));
+
+ // 2) Strong fallback: inspect BOTH parent records for every child of this person.
+ // The database model stores: child(person_id) -> parent(related_person_id).
+ // Therefore, if Kamal and Ruhi are both parents of Abdul ghani, Ruhi is Kamal's spouse
+ // even if an explicit spouse row was never created.
  childIdsForBuilder(id).forEach(cid=>{
-   relationships.filter(r=>r.relation_type==='parent'&&r.person_id===cid&&r.related_person_id!==id).forEach(r=>{const sid=r.related_person_id;if(sid&&sid!==id&&!ids.includes(sid))ids.push(sid)})
+   relationships.filter(r=>r.relation_type==='parent'&&r.person_id===cid)
+     .forEach(r=>{ if(r.related_person_id!==id) add(r.related_person_id); });
  });
+
+ // 3) Also support installations where a parent row was stored in the opposite
+ // direction by looking for a person who shares children with this person.
+ relationships.filter(r=>r.relation_type==='parent'&&r.related_person_id===id)
+   .forEach(r=>{
+     const childId=r.person_id;
+     relationships.filter(x=>x.relation_type==='parent'&&x.person_id===childId&&x.related_person_id!==id)
+       .forEach(x=>add(x.related_person_id));
+   });
+
  return ids;
 }
-function childIdsForBuilder(id){return relationships.filter(r=>r.relation_type==='parent'&&r.related_person_id===id).map(r=>r.person_id).filter(Boolean)}
+function childIdsForBuilder(id){
+ return relationships.filter(r=>r.relation_type==='parent'&&r.related_person_id===id)
+   .map(r=>r.person_id).filter(Boolean);
+}
 function hydrateBuilderPerson(id,seen=new Set(),depth=0){
  if(!id||seen.has(id)||depth>30)return null;
  const m=members.find(x=>x.id===id);if(!m)return null;
  seen.add(id);
  const p=builderPersonFromMember(m);
- const parents=relationships.filter(r=>r.relation_type==='parent'&&r.person_id===id).map(r=>members.find(x=>x.id===r.related_person_id)).filter(Boolean);
- const father=parents.find(x=>x.gender==='male');
+
+ const parents=relationships.filter(r=>r.relation_type==='parent'&&r.person_id===id)
+   .map(r=>members.find(x=>x.id===r.related_person_id)).filter(Boolean);
+ const father=parents.find(x=>String(x.gender||'').toLowerCase()==='male');
  p.father=father?hydrateBuilderPerson(father.id,new Set(seen),depth+1):null;
+
  const spouseIds=spouseIdsForBuilder(id);
- p.spouses=spouseIds.map(sid=>{const sp=hydrateBuilderPerson(sid,new Set(seen),depth+1);if(sp)sp.spouse_role=(sp.gender==='male'?'Husband':'Wife');return sp}).filter(Boolean).slice(0,3);
- const spouseChildIds=new Set(spouseIds.flatMap(sid=>childIdsForBuilder(sid)));
+ p.spouses=spouseIds.map(sid=>{
+   const sp=hydrateBuilderPerson(sid,new Set(seen),depth+1);
+   if(sp){
+     sp.spouse_role=(String(sp.gender||'').toLowerCase()==='male'?'Husband':'Wife');
+   }
+   return sp;
+ }).filter(Boolean).slice(0,3);
+
+ // Any child shared by the person and a spouse belongs inside that spouse's branch.
+ const spouseChildIds=new Set();
+ p.spouses.forEach((sp,i)=>{
+   const sid=spouseIds[i];
+   const ids=childIdsForBuilder(sid).filter(cid=>cid!==id);
+   ids.forEach(cid=>spouseChildIds.add(cid));
+   sp.children=ids.map(cid=>hydrateBuilderPerson(cid,new Set([...seen,sid]),depth+1)).filter(Boolean);
+ });
+
  const directChildIds=childIdsForBuilder(id).filter(cid=>!spouseChildIds.has(cid));
  p.children=directChildIds.map(cid=>hydrateBuilderPerson(cid,new Set(seen),depth+1)).filter(Boolean);
- p.spouses.forEach((sp,i)=>{const sid=spouseIds[i];sp.children=childIdsForBuilder(sid).map(cid=>hydrateBuilderPerson(cid,new Set(seen),depth+1)).filter(Boolean)});
  return p;
 }
-function openTreeBuilder(){builderDesign=localStorage.getItem('shamsitree_builder_design_'+(currentUser?.id||''))||'classic';builderRegistry={};let mainMember=null;if(currentUser){const mine=members.filter(m=>m.created_by===currentUser.id);mainMember=mine.find(m=>/^(kamal anwer|anwer kamal)$/i.test((m.full_name||'').trim()))||null;if(!mainMember&&mine.length===1)mainMember=mine[0]||null}if(!mainMember)mainMember=members.find(m=>/^(kamal anwer|anwer kamal)$/i.test((m.full_name||'').trim()))||null;if(!mainMember&&members.length===1)mainMember=members[0]||null;treeBuilder={main:mainMember?hydrateBuilderPerson(mainMember.id):null};renderTreeBuilder();document.getElementById('treeBuilderModal').style.display='block'}
+async function repairKamalFamilyLinks(){
+ if(!currentTree)return;
+ const findByNames=names=>members.find(m=>names.some(n=>String(m.full_name||'').trim().toLowerCase()===n));
+ const kamal=findByNames(['kamal anwer','anwer kamal']);
+ const ruhi=findByNames(['ruhi kamal']);
+ if(!kamal||!ruhi)return;
+ // The requested family structure is Kamal Anwer + Ruhi Kamal, with their children in Ruhi's branch.
+ let ok=await createRelationship(kamal.id,ruhi.id,'spouse');
+ if(!ok)throw new Error('Could not link Kamal Anwer and Ruhi Kamal.');
+ ok=await createRelationship(ruhi.id,kamal.id,'spouse');
+ if(!ok)throw new Error('Could not link Ruhi Kamal and Kamal Anwer.');
+ const childNames=['abdul ghani','sidrah kamal'];
+ for(const child of members.filter(m=>childNames.includes(String(m.full_name||'').trim().toLowerCase()))){
+   ok=await createRelationship(child.id,kamal.id,'parent');
+   if(!ok)throw new Error('Could not link '+(child.full_name||'child')+' to Kamal Anwer.');
+   ok=await createRelationship(child.id,ruhi.id,'parent');
+   if(!ok)throw new Error('Could not link '+(child.full_name||'child')+' to Ruhi Kamal.');
+ }
+}
+async function openTreeBuilder(){
+ builderDesign=localStorage.getItem('shamsitree_builder_design_'+(currentUser?.id||''))||'classic';
+ builderRegistry={};
+ let mainMember=null;
+ if(currentUser){const mine=members.filter(m=>m.created_by===currentUser.id);mainMember=mine.find(m=>/^(kamal anwer|anwer kamal)$/i.test((m.full_name||'').trim()))||null;if(!mainMember&&mine.length===1)mainMember=mine[0]||null}
+ if(!mainMember)mainMember=members.find(m=>/^(kamal anwer|anwer kamal)$/i.test((m.full_name||'').trim()))||null;
+ if(!mainMember&&members.length===1)mainMember=members[0]||null;
+ try{await repairKamalFamilyLinks()}catch(e){console.error('Family link repair:',e)}
+ treeBuilder={main:mainMember?hydrateBuilderPerson(mainMember.id):null};
+ renderTreeBuilder();
+ document.getElementById('treeBuilderModal').style.display='block'
+}
 function closeTreeBuilder(){document.getElementById('treeBuilderModal').style.display='none';closeBuilderForm()}
 function addBuilderFather(){if(!treeBuilder.main)return openBuilderForm('main');let target=treeBuilder.main;while(target.father)target=target.father;openBuilderForm('father',{owner:target})}
 function addBuilderSpouse(path){const owner=getBuilderPersonByPath(path);if(!owner)return;if(owner.spouses.length>=3)return alert('Up to 3 spouses can be added for one person.');openBuilderForm('spouse',{owner,path,index:owner.spouses.length})}
@@ -290,7 +361,7 @@ function closeBuilderInfo(){const d=document.getElementById('builderInfoModal');
 function printBuilderTree(){const area=document.getElementById('builderPrintable');if(!area)return;const title='ShamsiTree — Form B — Two-Way Family Tree';const win=window.open('','_blank','width=1600,height=1100');if(!win)return alert('Please allow pop-ups to print the tree.');const clone=area.cloneNode(true);clone.querySelectorAll('.builderToolbar,.builderActions,.builderHint').forEach(e=>e.remove());win.document.write('<!doctype html><html><head><title>'+title+'</title><style>'+document.querySelector('style').textContent+'@page{size:A2 landscape;margin:5mm}html,body{margin:0;background:#fff}body{font-family:Arial,sans-serif}.printWrap{width:100%;overflow:visible}.builderCanvas{overflow:visible!important;width:max-content!important;min-width:0!important;background:#fff!important;padding:6px!important}.builderVisualCard,.builderSpouseBranch,.builderDescNode{break-inside:avoid;page-break-inside:avoid}</style></head><body><h2 style="text-align:center;margin:0 0 8px">'+title+'</h2><div class="printWrap">'+clone.outerHTML+'</div><script>window.addEventListener("load",function(){var a=document.querySelector(".builderCanvas"),w=a.scrollWidth,h=a.scrollHeight,targetW=1500,targetH=1000,s=Math.min(1,targetW/w,targetH/h);if(s<1){a.style.transform="scale("+s+")";a.style.transformOrigin="top left";a.style.marginBottom=((h*s)-h)+"px";}setTimeout(function(){window.focus();window.print();},500);});<\/script></body></html>');win.document.close()}
 function collectBuilderPeople(){const out=[];const seen=new Set();function walk(p){if(!p||seen.has(p))return;seen.add(p);out.push(p);walk(p.father);(p.spouses||[]).forEach(w=>{walk(w);(w.children||[]).forEach(wc=>walk(wc))});(p.children||[]).forEach(c=>walk(c))}walk(treeBuilder.main);return out}
 async function saveBuilderPerson(p,gender){if(!p?.name)return null;const g=(gender||p.gender||'other').toLowerCase();let payload={full_name:p.name,gender:g.startsWith('m')?'male':g.startsWith('f')?'female':'other',date_of_birth:p.date_of_birth||null,date_of_death:p.date_of_death||null,phone:p.phone||null,biradari:p.biradari||null,birthplace:p.birthplace||null,current_residence:p.current_residence||null,location:p.current_residence||null,notes:p.notes||null,profile_photo:p.profile_photo||null};async function upsertWithFallback(id){let q;if(id)q=supabaseClient.from('family_members').update(payload).eq('id',id).eq('tree_id',currentTree.id).select().single();else q=supabaseClient.from('family_members').insert({id:p.existingId||p.personId,...payload,tree_id:currentTree.id,created_by:currentUser.id}).select().single();let r=await q;if(r.error&&payload.date_of_death&&/date_of_death|column/i.test(r.error.message||'')){const fallbackNotes=(payload.notes?payload.notes+'\n':'')+'[Date of Death: '+payload.date_of_death+']';const fallback={...payload};delete fallback.date_of_death;fallback.notes=fallbackNotes;const q2=id?supabaseClient.from('family_members').update(fallback).eq('id',id).eq('tree_id',currentTree.id).select().single():supabaseClient.from('family_members').insert({id:p.existingId||p.personId,...fallback,tree_id:currentTree.id,created_by:currentUser.id}).select().single();r=await q2}if(r.error)throw r.error;return r.data}let saved;if(p.existingId)saved=await upsertWithFallback(p.existingId);else{const norm=(p.name||'').trim().toLowerCase();const match=members.find(m=>(m.full_name||'').trim().toLowerCase()===norm&&(!p.date_of_birth||!m.date_of_birth||m.date_of_birth===p.date_of_birth));if(match){p.existingId=match.id;saved=await upsertWithFallback(match.id)}else saved=await upsertWithFallback(null)}if(saved){Object.assign(p,{existingId:saved.id,profile_photo:saved.profile_photo||p.profile_photo||''});const idx=members.findIndex(x=>x.id===saved.id);if(idx>=0)members[idx]=saved;else members.push(saved);if(p.photo_file){const path=await uploadFamilyPhotoXHRWithRetry({file:p.photo_file,folder:'members',recordId:saved.id,statusElement:null,retryButtonId:'__none'});const {error}=await supabaseClient.from('family_members').update({profile_photo:path}).eq('id',saved.id).eq('tree_id',currentTree.id);if(error)throw error;p.profile_photo=path;p.photo_file=null;saved.profile_photo=path}}return saved}
-async function saveTreeBuilder(){if(!currentUser||!currentTree)return alert('Please login and make sure your family tree is ready.');if(!treeBuilder.main)return alert('Please add the Main Person first.');try{const savePerson=async p=>p?await saveBuilderPerson(p,p.gender):null;async function savePersonSpouses(parent){for(const sp of (parent?.spouses||[])){const sm=await savePerson(sp);if(sm){sp.existingId=sm.id;let ok=await createRelationship(parent.existingId,sm.id,'spouse');if(!ok)throw new Error('Could not save spouse relationship.');ok=await createRelationship(sm.id,parent.existingId,'spouse');if(!ok)throw new Error('Could not save spouse relationship.');await saveChildren(parent,sp,sm)}}}async function saveChildren(parent,source,otherParent=null){for(const childSrc of (source?.children||[])){const child=await savePerson(childSrc);if(!child)continue;childSrc.existingId=child.id;let ok=await createRelationship(child.id,parent.existingId,'parent');if(!ok)throw new Error('Could not save parent-child relationship.');if(otherParent?.existingId){ok=await createRelationship(child.id,otherParent.existingId,'parent');if(!ok)throw new Error('Could not save second parent relationship.');}await savePersonSpouses(child);}}async function saveAncestorChain(person,source){if(!source?.father)return;const f=await savePerson(source.father);if(f){source.father.existingId=f.id;const ok=await createRelationship(person.existingId,f.id,'parent');if(!ok)throw new Error('Could not save ancestor relationship.');await saveAncestorChain(f,source.father)}}const main=await savePerson(treeBuilder.main);if(!main)throw new Error('Main Person could not be saved.');treeBuilder.main.existingId=main.id;await saveAncestorChain(main,treeBuilder.main);await savePersonSpouses(main);await saveChildren(main,treeBuilder.main,null);closeTreeBuilder();await loadMembers();showAppMessage('Two-way family tree saved successfully.','success')}catch(e){console.error(e);alert('Could not save family tree:\n'+e.message)}}
+async function saveTreeBuilder(){if(!currentUser||!currentTree)return alert('Please login and make sure your family tree is ready.');if(!treeBuilder.main)return alert('Please add the Main Person first.');try{const savePerson=async p=>p?await saveBuilderPerson(p,p.gender):null;async function savePersonSpouses(parent){for(const sp of (parent?.spouses||[])){const sm=await savePerson(sp);if(sm){sp.existingId=sm.id;let ok=await createRelationship(parent.existingId,sm.id,'spouse');if(!ok)throw new Error('Could not save spouse relationship.');ok=await createRelationship(sm.id,parent.existingId,'spouse');if(!ok)throw new Error('Could not save spouse relationship.');await saveChildren(parent,sp,sm)}}}async function saveChildren(parent,source,otherParent=null){for(const childSrc of (source?.children||[])){const child=await savePerson(childSrc);if(!child)continue;childSrc.existingId=child.id;let ok=await createRelationship(child.id,parent.existingId,'parent');if(!ok)throw new Error('Could not save parent-child relationship.');if(otherParent?.existingId){ok=await createRelationship(child.id,otherParent.existingId,'parent');if(!ok)throw new Error('Could not save second parent relationship.');}await savePersonSpouses(child);}}async function saveAncestorChain(person,source){if(!source?.father)return;const f=await savePerson(source.father);if(f){source.father.existingId=f.id;const ok=await createRelationship(person.existingId,f.id,'parent');if(!ok)throw new Error('Could not save ancestor relationship.');await saveAncestorChain(f,source.father)}}const main=await savePerson(treeBuilder.main);if(!main)throw new Error('Main Person could not be saved.');treeBuilder.main.existingId=main.id;await saveAncestorChain(main,treeBuilder.main);await savePersonSpouses(main);await saveChildren(main,treeBuilder.main,null);await repairKamalFamilyLinks();closeTreeBuilder();await loadMembers();showAppMessage('Two-way family tree saved successfully.','success')}catch(e){console.error(e);alert('Could not save family tree:\n'+e.message)}}
 async function loadConnectionCount(){let count=0;try{const {data,error}=await supabaseClient.from('tree_connections').select('*').or('requesting_tree_id.eq.'+currentTree.id+',requested_tree_id.eq.'+currentTree.id);if(!error)count=data?.length||0}catch(e){}connectionCount.textContent=count}
 async function changeLanguage(){currentLanguage=languageSelect.value;applyLanguage();if(currentUser){await supabaseClient.from('profiles').update({preferred_language:currentLanguage}).eq('id',currentUser.id)}}
 function applyLanguage(){const t=translations[currentLanguage]||translations.en;const btns=document.querySelectorAll('.sidebar button');if(btns.length>=6){btns[0].textContent='🏠 '+t.dashboard;btns[1].textContent='🌳 '+t.tree;btns[2].textContent='👨‍👩‍👧 '+t.members;btns[3].textContent='🔎 '+t.search;btns[4].textContent='📷 Memories';btns[5].textContent='⚙️ '+t.settings}}
