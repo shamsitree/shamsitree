@@ -310,7 +310,29 @@ function hydrateBuilderPerson(id,seen=new Set(),depth=0){
  });
 
  const directChildIds=childIdsForBuilder(id).filter(cid=>!spouseChildIds.has(cid));
- p.children=directChildIds.map(cid=>hydrateBuilderPerson(cid,new Set(seen),depth+1)).filter(Boolean);
+
+ // Compatibility fallback for the existing Kamal Anwer family:
+ // if Abdul Ghani is already linked to Kamal but the Ruhi parent link is
+ // missing, keep the child in Ruhi's branch in the builder so the family
+ // is displayed correctly; Save Tree will persist the missing links.
+ if(p.spouses.length && /^(kamal anwer|anwer kamal)$/i.test(String(p.name||'').trim())){
+   const ruhiIndex=p.spouses.findIndex(sp=>/^ruhi kamal$/i.test(String(sp.name||'').trim()));
+   if(ruhiIndex>=0){
+     const ruhi=p.spouses[ruhiIndex];
+     const moveIds=directChildIds.filter(cid=>{
+       const cm=members.find(x=>x.id===cid);
+       return /^(abdul ghani|sidrah kamal)$/i.test(String(cm?.full_name||'').trim());
+     });
+     moveIds.forEach(cid=>{
+       spouseChildIds.add(cid);
+       const c=hydrateBuilderPerson(cid,new Set([...seen,id]),depth+1);
+       if(c && !ruhi.children.some(x=>x.existingId===c.existingId))ruhi.children.push(c);
+     });
+   }
+ }
+
+ const remainingDirectIds=directChildIds.filter(cid=>!spouseChildIds.has(cid));
+ p.children=remainingDirectIds.map(cid=>hydrateBuilderPerson(cid,new Set(seen),depth+1)).filter(Boolean);
  return p;
 }
 async function repairKamalFamilyLinks(){
