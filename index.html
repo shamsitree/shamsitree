@@ -15,7 +15,8 @@
 
 .builderToolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;background:#f7fbff;border:1px solid #d8e8f5;border-radius:14px;padding:12px;margin-bottom:14px}.builderToolbarText{font-size:13px;color:#667085;margin-top:3px}.builderDesigns{display:flex;gap:7px;flex-wrap:wrap}.designBtn{background:#e9eef5;color:#172033}.designBtn.selected{background:#1769aa;color:#fff}.builderCanvas{border-radius:18px;padding:18px;min-height:380px;overflow:auto;background:#fff}.design-classic{background:linear-gradient(180deg,#ffffff,#f7fbff)}.design-heritage{background:linear-gradient(180deg,#fffdf7,#f8f2e6)}.design-soft{background:linear-gradient(180deg,#fff,#fbf7ff)}.builderAncestors{text-align:center}.builderSectionTitle{font-size:18px;font-weight:800;margin:4px 0 12px;color:#1769aa}.builderDownArrow{font-size:22px;color:#7b8794;margin:5px}.builderStart{text-align:center;padding:55px 20px;border:2px dashed #cbd9e6;border-radius:18px;background:#fbfdff}.builderMainArea{text-align:center}.builderMainCardWrap{display:flex;flex-direction:column;align-items:center}.builderVisualCard{display:inline-flex;flex-direction:column;align-items:center;min-width:220px;max-width:280px;padding:12px;border:2px solid #d5e5f2;background:#fff;border-radius:16px;box-shadow:0 4px 14px #00000010;cursor:pointer;transition:.15s}.builderVisualCard:hover,.builderSpouseCard:hover{transform:translateY(-2px);box-shadow:0 7px 18px #00000016}.builderVisualCard.mainCard{border-color:#4caf50}.builderRole{font-size:12px;font-weight:800;color:#667085;margin-bottom:7px}.builderAvatarImg{width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid #dce7f4;background:#eef2f6;display:flex;align-items:center;justify-content:center;font-size:30px}.builderAvatarImg.small{width:46px;height:46px;font-size:22px}.builderName{font-weight:800;margin-top:7px;line-height:1.2;overflow-wrap:anywhere}.builderMini{font-size:11px;color:#667085;margin-top:3px}.builderNotePreview{font-size:11px;color:#7c5a12;max-width:230px;margin-top:5px;line-height:1.35}.builderHint{font-size:10px;color:#98a2b3;margin-top:6px}.builderActions{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:8px}.builderActions.center{max-width:620px}.builderPlaceholder{min-width:220px;padding:18px;border:2px dashed #cbd9e6;border-radius:16px;background:#fbfdff;display:flex;flex-direction:column;gap:8px;align-items:center}.builderSpouseGrid{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:15px}.builderSpouseBranch{width:min(100%,360px);padding:12px;border:1px solid #d8e4ef;border-radius:16px;background:#ffffffcc;box-shadow:0 2px 9px #0000000a}.builderSpouseCard{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px;border:1px solid #ead7f5;border-radius:12px;background:#fff;cursor:pointer}.builderBranchTitle{font-weight:800;font-size:13px;margin:10px 0 7px}.builderChildrenRow{display:flex;gap:10px;justify-content:center;align-items:flex-start;flex-wrap:wrap;border-top:2px solid #d9e5ef;padding-top:12px}.builderDescNode{display:flex;flex-direction:column;align-items:center;max-width:300px}.childCard{min-width:190px;max-width:220px}.builderDirectChildren{margin:16px auto 0;max-width:1000px;padding:12px;border:1px dashed #cbd5e1;border-radius:14px}.builderNoSpouseHint{margin:15px auto;color:#667085;font-size:13px}.builderMainConnector{margin:10px auto 2px;padding:7px 12px;border-top:2px solid #d9e5ef;border-bottom:2px solid #d9e5ef;color:#1769aa;font-weight:800;font-size:12px;max-width:760px}.builderConnectionNote{margin:9px auto 5px;padding:6px 9px;border-left:3px solid #1769aa;background:#f7fbff;color:#667085;font-size:11px;border-radius:6px}.ancestorCard{margin:auto}.design-heritage .builderVisualCard{border-radius:8px;background:#fffaf0;border-color:#bfa66a}.design-heritage .builderSectionTitle{color:#8a6a2f}.design-soft .builderVisualCard{border-radius:22px;background:#fff;border-color:#d9c8f0}.design-soft .builderSectionTitle{color:#7b4bb7}.builderEmpty{color:#667085;text-align:center;padding:10px;font-size:13px}
 @media print{.builderToolbar,.builderActions,.builderHint{display:none!important}.builderCanvas{overflow:visible!important;width:max-content!important;background:#fff!important}.builderVisualCard,.builderSpouseBranch,.builderDescNode{break-inside:avoid}.modal{position:static;background:#fff;padding:0}.modalBox{max-width:none;box-shadow:none}}
-.personIdBadge{font-family:monospace;font-weight:700;opacity:.85}.builderFormHint{white-space:pre-line}.addressSuggestions{position:relative}.addressSuggestionsList{position:absolute;left:0;right:0;top:100%;z-index:100;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);max-height:220px;overflow:auto}.addressSuggestion{padding:10px;cursor:pointer}.addressSuggestion:hover{background:#f3f4f6}</style>
+.personIdBadge{font-family:monospace;font-weight:700;opacity:.85}.builderFormHint{white-space:pre-line}
+</style>
 </head>
 <body>
 <div id="authScreen"><div class="authBox">
@@ -45,114 +46,95 @@
   <div class="card"><h3>Family Members</h3><div class="big" id="memberCount">0</div></div>
   <div class="card"><h3>Connected Families</h3><div class="big" id="connectionCount">0</div></div>
 </div><div class="card"><h3>Welcome to ShamsiTree 🌳</h3><p>Build and preserve your family history in one place.</p><p class="muted small">Click any person in My Tree to see their full details.</p></div></section>
-<section id="tree" class="page"><div class="topbar"><div><h2>My Family Tree</h2><div id="treePageCode" class="treeCode">Tree ID: -</div></div><div class="actions"><button class="primary" onclick="openFamilySetup()">👨‍👩‍👧 Family Information</button><button class="secondary" onclick="openTreeBuilder()">🌳 Build Tree</button></div></div><div id="treeContainer" class="treeBox"><div class="empty">Loading...</div></div></section>
-<section id="members" class="page"><div class="topbar"><h2>Members</h2><div class="actions"><button class="primary" onclick="openFamilySetup()">👨‍👩‍👧 Family Information</button></div></div><input id="memberSearch" class="search" placeholder="Search Family Members" oninput="renderMembers()"><div class="tableWrap"><table><thead><tr><th>Name</th><th>Gender</th><th>Date of Birth</th><th>Biradari</th><th>Location</th><th>Actions</th></tr></thead><tbody id="membersTable"></tbody></table></div></section>
+
+<section id="tree" class="page"><div class="topbar"><div><h2>My Family Tree</h2><div id="treePageCode" class="treeCode">Tree ID: -</div></div><div class="actions"><button class="primary" onclick="openMemberModal()">+ Add Member</button><button class="secondary" onclick="openTreeBuilder()">🌳 Build Tree (Form B)</button></div></div><div id="treeContainer" class="treeBox"><div class="empty">Loading...</div></div></section>
+
+<section id="members" class="page"><div class="topbar"><h2>Members</h2><div class="actions"><button class="primary" onclick="openMemberModal()">+ Add Member</button></div></div><input id="memberSearch" class="search" placeholder="Search Family Members" oninput="renderMembers()"><div class="tableWrap"><table><thead><tr><th>Name</th><th>Gender</th><th>Date of Birth</th><th>Biradari</th><th>Location</th><th>Actions</th></tr></thead><tbody id="membersTable"></tbody></table></div></section>
+
 <section id="search" class="page"><h2>Search</h2><input id="searchInput" class="search" placeholder="Search by name, Biradari or location" oninput="searchMembers()"><div id="searchResults" class="results"></div></section>
 <section id="memories" class="page"><div class="topbar"><h2>📷 Memories</h2><button class="primary" onclick="openMemoryModal()">+ Add Memory</button></div><div id="memoriesList" class="results"></div></section>
- <section id="settings" class="page"><h2>Settings</h2><div class="card"><div class="field"><label>Language</label><select id="languageSelect" onchange="changeLanguage()"><option value="en">English</option><option value="hi">हिन्दी</option><option value="ur">اردو</option></select></div><p class="muted small">Your family data remains in Supabase. Changing this HTML file does not delete the database records.</p></div></section>
+
+<section id="settings" class="page"><h2>Settings</h2><div class="card"><div class="field"><label>Language</label><select id="languageSelect" onchange="changeLanguage()"><option value="en">English</option><option value="hi">हिन्दी</option><option value="ur">اردو</option></select></div></div></section>
 </main></div></div>
 
+<!-- Add/Edit Member Modal -->
 <div id="memberModal" class="modal"><div class="modalBox"><div class="modalHeader"><h2 id="modalTitle">Add Family Member</h2><button class="closeBtn" onclick="closeMemberModal()">✕</button></div>
-<input id="editMemberId" type="hidden"><div class="field"><label>Full Name</label><input id="memberName"></div><div class="familyGrid">
-<div class="field"><label>Gender</label><select id="memberGender"><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div>
-<div class="field"><label>Date of Birth</label><input id="memberDob" type="date"></div><div class="field"><label>Phone</label><input id="memberPhone" type="tel"></div><div class="field"><label>Biradari</label><input id="memberBiradari" list="biradariList" value="Shamsi"></div><div class="field"><label>Birthplace</label><input id="memberBirthplace" placeholder="City, Country"></div><div class="field"><label>Current Residence</label><input id="memberResidence" placeholder="City, Country"></div></div>
-<div class="photoBox"><img id="memberPhotoPreview" class="photoPreview" alt=""><div class="field" style="flex:1;margin:0"><label>Photo (optional)</label><input id="memberPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><small id="memberPhotoStatus" class="uploadStatus"></small><button type="button" id="retryMemberPhoto" class="secondary retryBtn">Retry Upload</button></div></div><input id="memberPhoto" type="hidden">
-<div class="familyGrid"><div class="field"><label>Father</label><select id="fatherId"><option value="">Select Father</option></select></div><div class="field"><label>Mother</label><select id="motherId"><option value="">Select Mother</option></select></div><div class="field"><label>Husband / Wife</label><select id="spouseId"><option value="">Select Spouse</option></select></div></div>
-<div class="field"><label>Notes / Family History</label><textarea id="memberNotes" placeholder="Optional family history, occupation, memories, or other notes"></textarea></div>
-<div class="modalActions"><button class="secondary" onclick="closeMemberModal()">Cancel</button><button id="saveMemberBtn" class="primary" onclick="saveMember()">Save Member</button></div></div></div>
+<input id="editMemberId" type="hidden">
+<div class="field"><label>Full Name</label><input id="memberName"></div>
+<div class="familyGrid">
+<div class="field"><label>Gender</label><select id="memberGender"><option value="male">Male</option><option value="female">Female</option></select></div>
+<div class="field"><label>Date of Birth</label><input id="memberDob" type="date"></div>
+<div class="field"><label>Phone</label><input id="memberPhone" type="tel"></div>
+<div class="field"><label>Biradari</label><input id="memberBiradari" list="biradariList" value="Shamsi"></div>
+<div class="field"><label>Birthplace</label><input id="memberBirthplace"></div>
+<div class="field"><label>Current Residence</label><input id="memberResidence"></div>
+</div>
+<div class="field"><label>Notes / Details</label><textarea id="memberNotes"></textarea></div>
+<div class="modalActions"><button class="secondary" onclick="closeMemberModal()">Cancel</button><button class="primary" onclick="saveMember()">Save Member</button></div></div></div>
 
-<div id="familySetupModal" class="modal"><div class="modalBox wide"><div class="modalHeader"><h2>👨‍👩‍👧 My Family</h2><button class="closeBtn" onclick="closeFamilySetup()">✕</button></div><div class="infoBox"><strong>Easy family setup</strong><br>اپنا نام لازمی درج کریں۔ والدین اور دادا دادی / نانا نانی کی جتنی معلومات موجود ہوں درج کریں۔ نام معلوم نہ ہو تو خالی چھوڑ سکتے ہیں۔ دوبارہ Save کرنے سے موجودہ ناموں کو دوبارہ بنانے کے بجائے اپ ڈیٹ کرنے کی کوشش کی جائے گی۔</div>
-<div id="familyForms"></div><div class="modalActions"><button class="secondary" onclick="closeFamilySetup()">Cancel</button><button class="primary" onclick="saveMyFamily()">Save My Family</button></div></div></div>
+<!-- FORM B TREE BUILDER MODAL -->
+<div id="treeBuilderModal" class="modal builderModal"><div class="modalBox wide"><div class="modalHeader"><h2>🌳 Form B Two-Way Interactive Tree Builder</h2><button class="closeBtn" onclick="closeTreeBuilder()">✕</button></div>
+<div class="builderIntro"><strong>Father side goes upward ↑</strong> and <strong>children go downward ↓</strong>. Multi-spouse and generations are linked automatically.</div>
+<div id="treeBuilderContent" class="builderCanvas design-classic"></div>
+<div class="modalActions"><button class="secondary" onclick="closeTreeBuilder()">Close</button></div></div></div>
 
-<div id="treeBuilderModal" class="modal builderModal"><div class="modalBox wide"><div class="modalHeader"><h2>🌳 ShamsiTree Form B — Two-Way Family Tree</h2><button class="closeBtn" onclick="closeTreeBuilder()">✕</button></div><div class="builderIntro"><strong>Father side goes upward ↑</strong> and <strong>children go downward ↓</strong>. Add up to 3 spouses for a person; each spouse keeps a separate children branch. This Form B builds a standalone family tree and does not connect it to other families.</div><div id="treeBuilderContent"></div><div class="modalActions"><button class="secondary" onclick="closeTreeBuilder()">Cancel</button><button class="primary" onclick="saveTreeBuilder()">💾 Save Tree</button></div></div></div>
+<!-- Detail Modal -->
+<div id="detailModal" class="modal"><div class="modalBox"><div class="modalHeader"><h2 id="detailTitle">Member Details</h2><button class="closeBtn" onclick="closeDetailModal()">✕</button></div><div id="detailContent"></div><div class="modalActions"><button class="secondary" onclick="closeDetailModal()">Close</button><button class="primary" id="detailEditButton">Edit</button></div></div></div>
 
-<div id="memoryModal" class="modal"><div class="modalBox"><div class="modalHeader"><h2 id="memoryModalTitle">Add Memory</h2><button class="closeBtn" onclick="closeMemoryModal()">✕</button></div><input id="memoryEditId" type="hidden"><div class="field"><label>Title</label><input id="memoryTitle" maxlength="120"></div><div class="field"><label>Notes</label><textarea id="memoryNotes" placeholder="Write a family memory, event, person, place, or story..."></textarea></div><div class="photoBox"><div style="width:78px;height:78px"><img id="memoryPhotoPreview" class="photoPreview" alt="Memory photo preview" style="display:none"></div><div class="field" style="flex:1;margin:0"><label>Photo (optional)</label><input id="memoryPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><small id="memoryPhotoStatus" class="uploadStatus"></small><button type="button" id="retryMemoryPhoto" class="secondary retryBtn">Retry Upload</button></div></div><div class="modalActions"><button class="secondary" onclick="closeMemoryModal()">Cancel</button><button id="saveMemoryBtn" class="primary" onclick="saveMemory()">Save Memory</button></div></div></div>
-
- <div id="detailModal" class="modal"><div class="modalBox"><div class="modalHeader"><h2 id="detailTitle">Member Details</h2><button class="closeBtn" onclick="closeDetailModal()">✕</button></div><div id="detailContent"></div><div class="modalActions"><button class="secondary" onclick="closeDetailModal()">Close</button><button class="primary" id="detailEditButton">Edit</button></div></div></div>
-
-<datalist id="biradariList"><option value="Shamsi"><option value="Ansari"><option value="Qureshi"><option value="Sheikh"><option value="Syed"><option value="Pathan"><option value="Rajput"><option value="Saifi"><option value="Raieni"><option value="Abbasi"><option value="Sakay"><option value="Naqvi"><option value="Rangrez"><option value="Turak"><option value="Siddiqui"><option value="Punjabi"><option value="Kokni"><option value="Memon"><option value="Nagori"><option value="Other"></datalist>
+<datalist id="biradariList"><option value="Shamsi"><option value="Ansari"><option value="Qureshi"><option value="Sheikh"><option value="Syed"><option value="Pathan"><option value="Rajput"><option value="Other"></datalist>
 
 <script>
 const SUPABASE_URL="https://qhobvzbjbsbtmorllnjz.supabase.co";
 const SUPABASE_KEY="sb_publishable_tRIMQFqiZu-tSRownnMMxQ_wjch-orJ";
 const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let currentUser=null,currentTree=null,members=[],relationships=[],currentLanguage="en",authMode="login";
-let selectedMemberPhoto=null,selectedProfilePhoto=null,selectedMemoryPhoto=null;
-let failedMemberUpload=null,failedProfileUpload=null,failedMemoryUpload=null;
-let memories=[];
-const roles=[
- {key:"self",title:"1. Myself / خود",required:true},
- {key:"father",title:"2. Father / والد"},{key:"mother",title:"3. Mother / والدہ"},
- {key:"pgf",title:"4. Paternal Grandfather / دادا"},{key:"pgm",title:"5. Paternal Grandmother / دادی"},
- {key:"mgf",title:"6. Maternal Grandfather / نانا"},{key:"mgm",title:"7. Maternal Grandmother / نانی"}
-];
-const translations={en:{dashboard:"Dashboard",tree:"My Family Tree",members:"Members",search:"Search",settings:"Settings"},hi:{dashboard:"डैशबोर्ड",tree:"मेरा परिवार वृक्ष",members:"सदस्य",search:"खोजें",settings:"सेटिंग्स"},ur:{dashboard:"ڈیش بورڈ",tree:"میرا خاندانی درخت",members:"ارکان",search:"ترتیبات"}};
+let currentUser=null,currentTree=null,members=[],relationships=[];
+let authMode="login";
 
 function esc(v){return String(v??"").replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function showAuth(mode){authMode=mode;loginTab.classList.toggle('active',mode==='login');registerTab.classList.toggle('active',mode==='register');registerFields.classList.toggle('hidden',mode!=='register');authButton.textContent=mode==='login'?'Login':'Create Account';clearAuthMessage()}
-function showAuthMessage(msg,type){authMessage.textContent=msg;authMessage.className='message '+type;authMessage.style.display='block'} 
+function showAuthMessage(msg,type){authMessage.textContent=msg;authMessage.className='message '+type;authMessage.style.display='block'}
 function clearAuthMessage(){authMessage.style.display='none'}
 function showAppMessage(msg,type){appMessage.textContent=msg;appMessage.className='message '+type;appMessage.style.display='block';setTimeout(()=>{appMessage.style.display='none'},4000)}
 
-async function submitAuth(){clearAuthMessage();const email=document.getElementById('email').value.trim(),password=document.getElementById('password').value;if(!email||!password)return showAuthMessage('Please enter email and password.','error');try{if(authMode==='register'){const name=document.getElementById('registerName').value.trim();if(!name)return showAuthMessage('Please enter your name.','error');const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{display_name:name}}});if(error)throw error;if(data.session)await startApp(data.session);else showAuthMessage('Account created. Please check your email if verification is required.','success')}else{const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw error;await startApp(data.session)}}catch(e){console.error(e);showAuthMessage(e.message||'Authentication failed.','error')}}
-async function checkSession(){const {data,error}=await supabaseClient.auth.getSession();if(error||!data.session)return showAuthScreen();await startApp(data.session);supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')showAuthScreen()})}
-async function startApp(session){if(!session?.user)return showAuthScreen();currentUser=session.user;authScreen.style.display='none';app.style.display='block';userEmail.textContent=currentUser.email||'';await loadProfile();await loadTree();await loadConnectionCount();loadMemories();setTimeout(setupPhotoInputs,0)}
+async function submitAuth(){clearAuthMessage();const email=document.getElementById('email').value.trim(),password=document.getElementById('password').value;if(!email||!password)return showAuthMessage('Please enter email and password.','error');try{if(authMode==='register'){const name=document.getElementById('registerName').value.trim();if(!name)return showAuthMessage('Please enter your name.','error');const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{display_name:name}}});if(error)throw error;if(data.session)await startApp(data.session);else showAuthMessage('Account created. Please login.','success')}else{const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw error;await startApp(data.session)}}catch(e){showAuthMessage(e.message||'Authentication failed.','error')}}
+async function checkSession(){const {data,error}=await supabaseClient.auth.getSession();if(error||!data.session)return showAuthScreen();await startApp(data.session)}
+async function startApp(session){if(!session?.user)return showAuthScreen();currentUser=session.user;authScreen.style.display='none';app.style.display='block';userEmail.textContent=currentUser.email||'';await loadTree()}
 function showAuthScreen(){authScreen.style.display='flex';app.style.display='none'}
-async function logout(){await supabaseClient.auth.signOut();currentUser=null;currentTree=null;members=[];relationships=[];showAuthScreen()}
-async function loadProfile(){if(!currentUser)return;const {data}=await supabaseClient.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();if(data){currentLanguage=data.preferred_language||'en';languageSelect.value=currentLanguage;applyLanguage()}}
+async function logout(){await supabaseClient.auth.signOut();currentUser=null;showAuthScreen()}
 
 async function loadTree(){
  if(!currentUser)return;
  try{
-  let {data:trees,error}=await supabaseClient.from('family_trees').select('*').eq('owner_user_id',currentUser.id).order('created_at',{ascending:true});
-  if(error){console.error('family_trees load error',error);return showAppMessage('Could not load family tree: '+error.message,'error')}
-  trees=trees||[];
-  let chosenTree=null,bestCount=-1;
-  for(const tree of trees){
-   const r=await supabaseClient.from('family_members').select('id').eq('tree_id',tree.id);
-   if(r.error){console.error('family_members check failed for tree',tree.id,r.error);continue}
-   const count=Array.isArray(r.data)?r.data.length:0;
-   if(count>bestCount){bestCount=count;chosenTree=tree}
-  }
-  if(!chosenTree||bestCount<=0){
-   const mine=await supabaseClient.from('family_members').select('tree_id').eq('created_by',currentUser.id);
-   if(!mine.error&&Array.isArray(mine.data)&&mine.data.length){
-    const counts={};
-    mine.data.forEach(x=>{if(x.tree_id)counts[x.tree_id]=(counts[x.tree_id]||0)+1});
-    const ids=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
-    for(const id of ids){
-     const existing=trees.find(t=>t.id===id);
-     if(existing){chosenTree=existing;bestCount=counts[id];break}
-     const tr=await supabaseClient.from('family_trees').select('*').eq('id',id).maybeSingle();
-     if(!tr.error&&tr.data){chosenTree=tr.data;bestCount=counts[id];break}
-    }
-   }
-  }
-  if(!trees.length){
+  let {data:trees}=await supabaseClient.from('family_trees').select('*').eq('owner_user_id',currentUser.id);
+  if(!trees || !trees.length){
    const r=await supabaseClient.from('family_trees').insert({owner_user_id:currentUser.id,name:'My Family Tree'}).select().single();
-   if(r.error)throw r.error;
-   trees=[r.data];chosenTree=r.data;bestCount=0;
+   trees=[r.data];
   }
-  currentTree=chosenTree||trees[0];
-  updateTreeInformation();
+  currentTree=trees[0];
+  treeName.textContent=currentTree.name;
+  dashboardTreeCode.textContent='Tree ID: '+(currentTree.tree_code||currentTree.id.slice(0,8));
+  treePageCode.textContent='Tree ID: '+(currentTree.tree_code||currentTree.id.slice(0,8));
   await loadMembers();
- }catch(e){
-  console.error('loadTree failed',e);
-  showAppMessage('Could not load family tree: '+(e.message||e),'error');
- }
+ }catch(e){console.error(e)}
 }
 
-function updateTreeInformation(){const name=currentTree?.name||'My Family Tree',code=currentTree?.tree_code||'Not assigned';treeName.textContent=name;dashboardTreeCode.textContent='Tree ID: '+code;treePageCode.textContent='Tree ID: '+code}
-async function loadMembers(){if(!currentTree)return;const {data,error}=await supabaseClient.from('family_members').select('*').eq('tree_id',currentTree.id).order('full_name',{ascending:true});if(error)return showAppMessage('Could not load members: '+error.message,'error');members=data||[];await loadRelationships();renderMembers();renderTree();memberCount.textContent=members.length}
-async function loadRelationships(){if(!currentTree){relationships=[];return}const {data,error}=await supabaseClient.from('relationships').select('*').eq('tree_id',currentTree.id);if(!error)relationships=data||[]}
-async function loadConnectionCount(){connectionCount.textContent='0'}
+async function loadMembers(){
+ if(!currentTree)return;
+ const {data}=await supabaseClient.from('family_members').select('*').eq('tree_id',currentTree.id).order('full_name',{ascending:true});
+ members=data||[];
+ memberCount.textContent=members.length;
+ const {data:relData}=await supabaseClient.from('relationships').select('*').eq('tree_id',currentTree.id);
+ relationships=relData||[];
+ renderMembers();
+ renderTree();
+}
 
 function openPage(pageId,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.sidebar button').forEach(b=>b.classList.remove('active'));document.getElementById(pageId).classList.add('active');if(btn)btn.classList.add('active')}
 
 function renderMembers(){
  const tbody=document.getElementById('membersTable');
  const q=document.getElementById('memberSearch')?.value.toLowerCase()||'';
- const filtered=members.filter(m=>!q||m.full_name?.toLowerCase().includes(q)||(m.biradari&&m.biradari.toLowerCase().includes(q)));
+ const filtered=members.filter(m=>!q||m.full_name?.toLowerCase().includes(q));
  tbody.innerHTML=filtered.map(m=>`
   <tr>
    <td><strong>${esc(m.full_name)}</strong></td>
@@ -170,10 +152,116 @@ function renderMembers(){
 
 function renderTree(){
  const container=document.getElementById('treeContainer');
- if(!members.length){container.innerHTML='<div class="empty">No family members found. Use "Family Information" or "Build Tree" to start.</div>';return}
- container.innerHTML=`<div class="treeRoots">${members.slice(0,10).map(m=>`<div class="treeCard" onclick="viewMember('${m.id}')"><img class="treePhoto" src="${m.photo_url||'https://via.placeholder.com/68'}" alt=""><div class="treeName">${esc(m.full_name)}</div><div class="treeRelation">${esc(m.biradari||'')}</div></div>`).join('')}</div>`;
+ if(!members.length){container.innerHTML='<div class="empty">No family members found. Click "Build Tree (Form B)" to start!</div>';return}
+ container.innerHTML=`<div class="treeRoots" style="display:flex;flex-wrap:wrap;gap:15px;justify-content:center">${members.map(m=>`
+  <div class="treeCard" onclick="viewMember('${m.id}')">
+   <div class="treeName"><strong>${esc(m.full_name)}</strong></div>
+   <div class="treeRelation">${esc(m.gender||'')}</div>
+   <div class="treeRelation" style="color:#1769aa">${esc(m.biradari||'')}</div>
+  </div>`).join('')}</div>`;
 }
 
+/* FORM B TWO-WAY BUILDER LOGIC */
+function openTreeBuilder(){
+ document.getElementById('treeBuilderModal').style.display='block';
+ renderFormBTree();
+}
+function closeTreeBuilder(){document.getElementById('treeBuilderModal').style.display='none'}
+
+function renderFormBTree(){
+ const c=document.getElementById('treeBuilderContent');
+ if(!members.length){
+  c.innerHTML=`<div class="builderStart">
+   <h3>Form B: Family Tree Builder</h3>
+   <p>Add the first member to start building the tree.</p>
+   <button class="primary" onclick="quickAddPerson('Myself','male')">+ Add Myself</button>
+  </div>`;
+  return;
+ }
+ 
+ const roots=members.filter(m=>{
+  const isChild=relationships.some(r=>r.person2_id===m.id && r.relationship_type==='parent');
+  return !isChild;
+ });
+
+ c.innerHTML=`<div class="builderFlow">
+  <div style="margin-bottom:15px"><button class="primary small" onclick="quickAddPerson('New Member','male')">+ Add New Standalone Person</button></div>
+  <div class="builderAncestors">
+   <div class="builderSectionTitle">🌳 Family Tree Structure</div>
+   ${roots.map(r=>renderNodeCascade(r.id)).join('')}
+  </div>
+ </div>`;
+}
+
+function renderNodeCascade(personId){
+ const p=members.find(m=>m.id===personId);
+ if(!p)return '';
+
+ const spouseRels=relationships.filter(r=>(r.person1_id===personId||r.person2_id===personId) && r.relationship_type==='spouse');
+ const spouses=spouseRels.map(r=>members.find(m=>m.id===(r.person1_id===personId?r.person2_id:r.person1_id))).filter(Boolean);
+
+ const childRels=relationships.filter(r=>r.person1_id===personId && r.relationship_type==='parent');
+ const children=childRels.map(r=>members.find(m=>m.id===r.person2_id)).filter(Boolean);
+
+ return `<div class="builderMainCardWrap" style="margin:20px 0;padding:15px;border:1px dashed #cbd9e6;border-radius:15px;background:#fff">
+  <div class="builderVisualCard mainCard" onclick="viewMember('${p.id}')">
+   <div class="builderRole">${esc(p.gender==='female'?'Female':'Male')}</div>
+   <div class="builderName">${esc(p.full_name)}</div>
+   <div class="builderMini">${esc(p.biradari||'Shamsi')}</div>
+  </div>
+  
+  <div class="builderActions">
+   <button class="secondary small" onclick="quickAddRelative('${p.id}','father')">↑ Add Father</button>
+   <button class="secondary small" onclick="quickAddRelative('${p.id}','spouse')">+ Add Spouse</button>
+   <button class="primary small" onclick="quickAddRelative('${p.id}','child')">↓ Add Child</button>
+  </div>
+
+  ${spouses.length ? `<div class="builderSpouseGrid"><strong>Spouse(s):</strong> ${spouses.map(s=>`<span class="builderSpouseCard" onclick="viewMember('${s.id}')">❤️ ${esc(s.full_name)}</span>`).join(' ')}</div>` : ''}
+
+  ${children.length ? `
+   <div class="builderChildrenRow" style="margin-top:15px">
+    ${children.map(c=>renderNodeCascade(c.id)).join('')}
+   </div>
+  ` : ''}
+ </div>`;
+}
+
+async function quickAddPerson(name,gender){
+ const payload={tree_id:currentTree.id,full_name:name,gender:gender,biradari:'Shamsi',created_by:currentUser.id};
+ const {data,error}=await supabaseClient.from('family_members').insert(payload).select().single();
+ if(error)return alert('Error: '+error.message);
+ await loadMembers();
+ renderFormBTree();
+}
+
+async function quickAddRelative(baseId,type){
+ const relName=prompt(`Enter name for ${type}:`);
+ if(!relName)return;
+ const gender=type==='father'?'male':(type==='spouse'?'female':'male');
+ const {data:newP,error}=await supabaseClient.from('family_members').insert({tree_id:currentTree.id,full_name:relName,gender:gender,biradari:'Shamsi',created_by:currentUser.id}).select().single();
+ if(error)return alert('Error: '+error.message);
+
+ let relPayload={tree_id:currentTree.id};
+ if(type==='father'){
+  relPayload.person1_id=newP.id;
+  relPayload.person2_id=baseId;
+  relPayload.relationship_type='parent';
+ }else if(type==='child'){
+  relPayload.person1_id=baseId;
+  relPayload.person2_id=newP.id;
+  relPayload.relationship_type='parent';
+ }else if(type==='spouse'){
+  relPayload.person1_id=baseId;
+  relPayload.person2_id=newP.id;
+  relPayload.relationship_type='spouse';
+ }
+
+ await supabaseClient.from('relationships').insert(relPayload);
+ await loadMembers();
+ renderFormBTree();
+}
+
+/* MEMBER ACTIONS */
 function openMemberModal(id=null){
  document.getElementById('editMemberId').value=id||'';
  document.getElementById('modalTitle').textContent=id?'Edit Family Member':'Add Family Member';
@@ -188,14 +276,10 @@ function openMemberModal(id=null){
    document.getElementById('memberBirthplace').value=m.birthplace||'';
    document.getElementById('memberResidence').value=m.current_residence||'';
    document.getElementById('memberNotes').value=m.notes||'';
-   document.getElementById('memberPhoto').value=m.photo_url||'';
-   document.getElementById('memberPhotoPreview').src=m.photo_url||'';
   }
  }else{
   document.getElementById('memberName').value='';
   document.getElementById('memberNotes').value='';
-  document.getElementById('memberPhoto').value='';
-  document.getElementById('memberPhotoPreview').src='';
  }
  document.getElementById('memberModal').style.display='block';
 }
@@ -214,14 +298,11 @@ async function saveMember(){
   birthplace:document.getElementById('memberBirthplace').value.trim()||null,
   current_residence:document.getElementById('memberResidence').value.trim()||null,
   notes:document.getElementById('memberNotes').value.trim()||null,
-  photo_url:document.getElementById('memberPhoto').value||null,
   created_by:currentUser.id
  };
- if(!payload.full_name)return alert('Please enter name');
- let res;
- if(id){res=await supabaseClient.from('family_members').update(payload).eq('id',id)}
- else{res=await supabaseClient.from('family_members').insert(payload)}
- if(res.error)return alert('Error saving: '+res.error.message);
+ if(!payload.full_name)return alert('Please enter full name');
+ if(id){await supabaseClient.from('family_members').update(payload).eq('id',id)}
+ else{await supabaseClient.from('family_members').insert(payload)}
  closeMemberModal();
  await loadMembers();
 }
@@ -246,19 +327,9 @@ function viewMember(id){
 }
 
 function closeDetailModal(){document.getElementById('detailModal').style.display='none'}
-function openFamilySetup(){openMemberModal()}
-function closeFamilySetup(){closeMemberModal()}
-function openTreeBuilder(){alert('Form B Two-Way Builder Open')}
-function closeTreeBuilder(){document.getElementById('treeBuilderModal').style.display='none'}
-function saveTreeBuilder(){}
 function searchMembers(){const q=document.getElementById('searchInput').value.toLowerCase();const results=document.getElementById('searchResults');results.innerHTML=members.filter(m=>m.full_name.toLowerCase().includes(q)).map(m=>`<div class="resultCard" onclick="viewMember('${m.id}')"><h3>${esc(m.full_name)}</h3><p>${esc(m.biradari||'')}</p></div>`).join('')}
 function openMemoryModal(){document.getElementById('memoryModal').style.display='block'}
 function closeMemoryModal(){document.getElementById('memoryModal').style.display='none'}
-function saveMemory(){closeMemoryModal()}
-function loadMemories(){}
-function setupPhotoInputs(){}
-function changeLanguage(){currentLanguage=languageSelect.value;applyLanguage()}
-function applyLanguage(){}
 
 checkSession();
 </script>
