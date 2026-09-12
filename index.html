@@ -338,6 +338,12 @@ function hydrateBuilderPerson(id,seen=new Set(),depth=0){
      if(cp){onlySpouse.children.push(cp);spouseChildIds.add(cid)}
    });
  }
+ // When this person has a spouse branch, children already belonging to that
+ // couple must not also appear in the direct-child area. The direct-child
+ // section is reserved for children with no spouse branch.
+ if(p.spouses.length===1){
+   p.children=[];
+ }
  p.children=directChildIds.filter(cid=>!spouseChildIds.has(cid))
    .map(cid=>hydrateBuilderPerson(cid,new Set(seen),depth+1)).filter(Boolean);
  return p;
@@ -361,14 +367,14 @@ async function repairFormBRelationships(){
    // is a child of this couple. Add the second parent link without deleting or
    // changing any child data. This covers Abdul Ghani, Sidrah, Ibrahim, Masoom,
    // and any future child added directly to Kamal.
-   const spouseIds=spouseIdsForBuilder(main.id);
-   const uniqueSpouses=[...new Set(spouseIds)];
-   if(uniqueSpouses.length===1 && uniqueSpouses[0]===ruhi.id){
-     const directChildren=childIdsForBuilder(main.id);
-     for(const childId of directChildren){
-       const ok=await createRelationship(childId,ruhi.id,'parent');
-       if(!ok)throw new Error('Could not link child to Ruhi Kamal.');
-     }
+   // For the current Form B family, Ruhi is the recorded spouse of Kamal.
+   // Every child already connected to Kamal is therefore connected to BOTH
+   // parents. This makes the same child belong to Kamal's family tree and
+   // Ruhi's spouse branch, rather than being an orphan/direct-only branch.
+   const directChildren=childIdsForBuilder(main.id);
+   for(const childId of directChildren){
+     const ok=await createRelationship(childId,ruhi.id,'parent');
+     if(!ok)throw new Error('Could not link child to Ruhi Kamal.');
    }
  }
 
