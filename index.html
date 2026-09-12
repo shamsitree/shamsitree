@@ -331,6 +331,22 @@ function hydrateBuilderPerson(id,seen=new Set(),depth=0){
    }
  }
 
+ // If a person has exactly one spouse branch, children already linked to the
+ // person are shown in that spouse branch as well. This keeps older/incomplete
+ // relationship data from leaving children in the separate direct-child area.
+ if(p.spouses.length===1){
+   const onlySpouse=p.spouses[0];
+   const sid=spouseIds[0];
+   directChildIds.forEach(cid=>{
+     if(!spouseChildIds.has(cid)){
+       spouseChildIds.add(cid);
+       if(!onlySpouse.children.some(c=>c?.existingId===cid||c?.personId===cid)){
+         const cp=hydrateBuilderPerson(cid,new Set([...seen,sid]),depth+1);
+         if(cp)onlySpouse.children.push(cp);
+       }
+     }
+   });
+ }
  const remainingDirectIds=directChildIds.filter(cid=>!spouseChildIds.has(cid));
  p.children=remainingDirectIds.map(cid=>hydrateBuilderPerson(cid,new Set(seen),depth+1)).filter(Boolean);
  return p;
