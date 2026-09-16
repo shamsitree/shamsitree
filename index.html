@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ShamsiTree Form B Complete 7.5 — merged from Main 7.4 Form B + requested Form B React logic -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -64,13 +65,13 @@
 <div id="familySetupModal" class="modal"><div class="modalBox wide"><div class="modalHeader"><h2>👨‍👩‍👧 My Family</h2><button class="closeBtn" onclick="closeFamilySetup()">✕</button></div><div class="infoBox"><strong>Easy family setup</strong><br>اپنا نام لازمی درج کریں۔ والدین اور دادا دادی / نانا نانی کی جتنی معلومات موجود ہوں درج کریں۔ نام معلوم نہ ہو تو خالی چھوڑ سکتے ہیں۔ دوبارہ Save کرنے سے موجودہ ناموں کو دوبارہ بنانے کے بجائے اپ ڈیٹ کرنے کی کوشش کی جائے گی۔</div>
 <div id="familyForms"></div><div class="modalActions"><button class="secondary" onclick="closeFamilySetup()">Cancel</button><button class="primary" onclick="saveMyFamily()">Save My Family</button></div></div></div>
 
-<div id="treeBuilderModal" class="modal builderModal"><div class="modalBox wide"><div class="modalHeader"><h2>🌳 ShamsiTree Form B — Two-Way Family Tree</h2><button class="closeBtn" onclick="closeTreeBuilder()">✕</button></div><div class="builderIntro"><strong>Father side goes upward ↑</strong> and <strong>children go downward ↓</strong>. Add up to 3 spouses for a person; each spouse keeps a separate children branch. This Form B builds a standalone family tree and does not connect it to other families.</div><div id="treeBuilderContent"></div><div class="modalActions"><button class="secondary" onclick="closeTreeBuilder()">Cancel</button><button class="primary" onclick="saveTreeBuilder()">💾 Save Tree</button></div></div></div>
+<div id="treeBuilderModal" class="modal builderModal"><div class="modalBox wide"><div class="modalHeader"><h2>🌳 ShamsiTree Form B — Complete Two-Way Family Tree <span class="small">7.5</span></h2><button class="closeBtn" onclick="closeTreeBuilder()">✕</button></div><div class="builderIntro"><strong>Father side goes upward ↑</strong> and <strong>children go downward ↓</strong>. Add up to 3 spouses for a person; each spouse keeps a separate children branch. This Form B builds a standalone family tree and does not connect it to other families. Existing records are reused where possible; unrelated family data is not deleted.</div><div id="treeBuilderContent"></div><div class="modalActions"><button class="secondary" onclick="closeTreeBuilder()">Cancel</button><button class="primary" onclick="saveTreeBuilder()">💾 Save Tree</button></div></div></div>
 
 <div id="memoryModal" class="modal"><div class="modalBox"><div class="modalHeader"><h2 id="memoryModalTitle">Add Memory</h2><button class="closeBtn" onclick="closeMemoryModal()">✕</button></div><input id="memoryEditId" type="hidden"><div class="field"><label>Title</label><input id="memoryTitle" maxlength="120"></div><div class="field"><label>Notes</label><textarea id="memoryNotes" placeholder="Write a family memory, event, person, place, or story..."></textarea></div><div class="photoBox"><div style="width:78px;height:78px"><img id="memoryPhotoPreview" class="photoPreview" alt="Memory photo preview" style="display:none"></div><div class="field" style="flex:1;margin:0"><label>Photo (optional)</label><input id="memoryPhotoInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><small id="memoryPhotoStatus" class="uploadStatus"></small><button type="button" id="retryMemoryPhoto" class="secondary retryBtn">Retry Upload</button></div></div><div class="modalActions"><button class="secondary" onclick="closeMemoryModal()">Cancel</button><button id="saveMemoryBtn" class="primary" onclick="saveMemory()">Save Memory</button></div></div></div>
 
  <div id="detailModal" class="modal"><div class="modalBox"><div class="modalHeader"><h2 id="detailTitle">Member Details</h2><button class="closeBtn" onclick="closeDetailModal()">✕</button></div><div id="detailContent"></div><div class="modalActions"><button class="secondary" onclick="closeDetailModal()">Close</button><button class="primary" id="detailEditButton">Edit</button></div></div></div>
 
-<datalist id="biradariList"><option value="Shamsi"><option value="Ansari"><option value="Qureshi"><option value="Sheikh"><option value="Syed"><option value="Pathan"><option value="Rajput"><option value="Saifi"><option value="Raieni"><option value="Abbasi"><option value="Sakay"><option value="Naqvi"><option value="Rangrez"><option value="Turak"><option value="Siddiqui"><option value="Punjabi"><option value="Kokni"><option value="Memon"><option value="Nagori"><option value="Other"></datalist>
+<datalist id="biradariList"><option value="Shamsi"><option value="Saifi"><option value="Raieni / Raeni"><option value="Abbasi"><option value="Sakay"><option value="Naqvi"><option value="Rangrez"><option value="Turak"><option value="Siddiqui"><option value="Punjabi"><option value="Kokni"><option value="Memon"><option value="Nagori"></datalist>
 
 <script>
 const SUPABASE_URL="https://qhobvzbjbsbtmorllnjz.supabase.co";
@@ -156,10 +157,30 @@ async function loadTree(){
  }
 }
 function updateTreeInformation(){const name=currentTree?.name||'My Family Tree',code=currentTree?.tree_code||'Not assigned';treeName.textContent=name;dashboardTreeCode.textContent='Tree ID: '+code;treePageCode.textContent='Tree ID: '+code}
-async function loadMembers(){if(!currentTree)return;const {data,error}=await supabaseClient.from('family_members').select('*').eq('tree_id',currentTree.id).order('full_name',{ascending:true});if(error)return showAppMessage('Could not load members: '+error.message,'error');members=data||[];await loadRelationships();renderMembers();renderTree();memberCount.textContent=members.length}
+async function loadMembers(){if(!currentTree)return;const {data,error}=await supabaseClient.from('family_members').select('*').eq('tree_id',currentTree.id).order('full_name',{ascending:true});if(error)return showAppMessage('Could not load members: '+error.message,'error');members=data||[];await loadRelationships();normalizeFormBRelationships();renderMembers();renderTree();memberCount.textContent=members.length}
 async function loadRelationships(){if(!currentTree){relationships=[];return}const {data,error}=await supabaseClient.from('relationships').select('*').eq('tree_id',currentTree.id);if(error){console.error(error);relationships=[];return}relationships=data||[]}
+function normalizeFormBRelationships(){
+ relationships=relationships.map(r=>({...r,relation_type:r.relation_type||r.relationship_type||''}));
+}
+
 function relationExists(a,b,type){return relationships.some(r=>r.person_id===a&&r.related_person_id===b&&r.relation_type===type)}
-async function createRelationship(personId,relatedId,type){if(!personId||!relatedId||personId===relatedId||relationExists(personId,relatedId,type))return true;const {data,error}=await supabaseClient.from('relationships').insert({tree_id:currentTree.id,person_id:personId,related_person_id:relatedId,relation_type:type}).select().maybeSingle();if(error){console.error(error);return false}if(data)relationships.push(data);return true}
+function formBRelationColumn(){
+  // Current ShamsiTree schema uses relation_type. Older drafts used relationship_type.
+  return relationships.some(r=>Object.prototype.hasOwnProperty.call(r,'relation_type'))?'relation_type':'relationship_type';
+}
+async function createRelationship(personId,relatedId,type){
+ if(!personId||!relatedId||personId===relatedId)return true;
+ if(relationExists(personId,relatedId,type))return true;
+ const column='relation_type';
+ const payload={tree_id:currentTree.id,person_id:personId,related_person_id:relatedId}; payload[column]=type;
+ let r=await supabaseClient.from('relationships').insert(payload).select().maybeSingle();
+ if(r.error && /relation_type|column/i.test(r.error.message||'')){
+   const fallback={tree_id:currentTree.id,person_id:personId,related_person_id:relatedId,relationship_type:type};
+   r=await supabaseClient.from('relationships').insert(fallback).select().maybeSingle();
+ }
+ if(r.error){console.error(r.error);return false}
+ if(r.data)relationships.push(r.data); return true;
+}
 async function saveRelationships(personId,fatherId,motherId,spouseId){if(fatherId)await createRelationship(personId,fatherId,'parent');if(motherId)await createRelationship(personId,motherId,'parent');if(spouseId){await createRelationship(personId,spouseId,'spouse');await createRelationship(spouseId,personId,'spouse')}}
 function populateRelationshipLists(excludeId=null){fatherId.innerHTML='<option value="">Select Father</option>';motherId.innerHTML='<option value="">Select Mother</option>';spouseId.innerHTML='<option value="">Select Spouse</option>';members.forEach(m=>{if(excludeId&&m.id===excludeId)return;const o=document.createElement('option');o.value=m.id;o.textContent=m.full_name;fatherId.appendChild(o.cloneNode(true));motherId.appendChild(o.cloneNode(true));spouseId.appendChild(o.cloneNode(true))})}
 function openMemberModal(member=null){populateRelationshipLists(member?.id);editMemberId.value=member?.id||'';modalTitle.textContent=member?'Edit Family Member':'Add Family Member';memberName.value=member?.full_name||'';memberGender.value=member?.gender||'male';memberDob.value=member?.date_of_birth||'';memberPhone.value=member?.phone||'';memberBiradari.value=member?.biradari||'Shamsi';memberBirthplace.value=member?.birthplace||'';memberResidence.value=member?.current_residence||member?.location||'';memberPhoto.value=member?.profile_photo||'';memberNotes.value=member?.notes||'';selectedMemberPhoto=null;failedMemberUpload=null;const pi=document.getElementById('memberPhotoInput');if(pi)pi.value='';showRetryButton('retryMemberPhoto',false);setUploadStatus(document.getElementById('memberPhotoStatus'),'');previewStoredPhoto('memberPhoto','memberPhotoPreview');fatherId.value='';motherId.value='';spouseId.value='';if(member){relationships.filter(r=>r.person_id===member.id&&r.relation_type==='parent').forEach(r=>{const p=members.find(m=>m.id===r.related_person_id);if(p?.gender==='male')fatherId.value=p.id;else if(p?.gender==='female')motherId.value=p.id});const s=relationships.find(r=>r.person_id===member.id&&r.relation_type==='spouse');if(s)spouseId.value=s.related_person_id}memberModal.style.display='block'}
@@ -354,7 +375,7 @@ function hydrateBuilderPerson(id,seen=new Set(),depth=0){
 }
 
 
-function chooseBuilderRootMember(){
+function chooseBuilderRootMember(){const storedRootId=localStorage.getItem('shamsitree_formb_root_'+(currentTree?.id||''));if(storedRootId){const stored=members.find(m=>m.id===storedRootId);if(stored)return stored;}
  if(!members.length)return null;
  // Form A explicitly marks the user's own record. This must always win over
  // relationship-graph scoring, because a graph center is not necessarily the user.
@@ -450,6 +471,8 @@ function renderMemories(){const box=document.getElementById('memoriesList');if(!
 function openMemoryModalById(id){const m=memories.find(x=>x.id===id);if(m)openMemoryModal(m)}
 async function saveMemory(){const title=document.getElementById('memoryTitle').value.trim();const notes=document.getElementById('memoryNotes').value.trim();if(!title&&!notes&&!selectedMemoryPhoto)return alert('Please add a title, note, or photo.');const saveButton=document.getElementById('saveMemoryBtn');const existingId=document.getElementById('memoryEditId').value;const id=existingId||crypto.randomUUID();const item={id,title,notes,photo_path:memories.find(x=>x.id===id)?.photo_path||null,created_at:memories.find(x=>x.id===id)?.created_at||new Date().toISOString()};try{setSaveButtonState(saveButton,true,'Saving...');if(selectedMemoryPhoto){setSaveButtonState(saveButton,true,'Uploading photo...');try{item.photo_path=await uploadFamilyPhotoXHRWithRetry({file:selectedMemoryPhoto,folder:'memories',recordId:id,statusElement:document.getElementById('memoryPhotoStatus'),retryButtonId:'retryMemoryPhoto'});selectedMemoryPhoto=null;failedMemoryUpload=null}catch(e){failedMemoryUpload={memoryId:id};const key='shamsitree_memories_'+currentUser.id;const existing=JSON.parse(localStorage.getItem(key)||'[]');const pos=existing.findIndex(x=>x.id===id);if(pos>=0)existing[pos]=item;else existing.push(item);localStorage.setItem(key,JSON.stringify(existing));memories=existing;renderMemories();throw new Error('Memory saved, but photo upload failed. You can use Retry Upload. '+e.message)}}const key='shamsitree_memories_'+currentUser.id;const pos=memories.findIndex(x=>x.id===id);if(pos>=0)memories[pos]=item;else memories.push(item);localStorage.setItem(key,JSON.stringify(memories));closeMemoryModal();renderMemories();showAppMessage('Memory saved successfully.','success');setSaveButtonState(saveButton,false)}catch(e){setSaveButtonState(saveButton,false);alert('Could not save memory:\n'+e.message)}}
 function deleteMemory(id){if(!confirm('Delete this memory?'))return;memories=memories.filter(x=>x.id!==id);localStorage.setItem('shamsitree_memories_'+currentUser.id,JSON.stringify(memories));renderMemories();showAppMessage('Memory deleted successfully.','success')}
+function rememberFormBRoot(){if(treeBuilder?.main?.existingId&&currentTree?.id)localStorage.setItem('shamsitree_formb_root_'+currentTree.id,treeBuilder.main.existingId)}
+const _renderTreeBuilderOriginal=renderTreeBuilder; renderTreeBuilder=function(){rememberFormBRoot();return _renderTreeBuilderOriginal()};
 checkSession();
 </script>
 </body></html>
