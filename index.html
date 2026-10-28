@@ -625,7 +625,7 @@ function chooseBuilderRootMember(){const storedRootId=localStorage.getItem('sham
 }
 
 async function getOrCreateFormBTree(){
- const {data,error}=await supabaseClient.from('family_trees').select('*').eq('owner_user_id',currentUser.id).eq('name',FORM_B_TREE_NAME).maybeSingle();
+ const {data,error}=await supabaseClient.from('family_trees').select('*').eq('owner_user_id',currentUser.id).eq('name',FORM_B_TREE_NAME).order('created_at',{ascending:true}).limit(1).maybeSingle();
  if(error)throw error;
  if(data)return data;
  const {data:created,error:createError}=await supabaseClient.from('family_trees').insert({owner_user_id:currentUser.id,name:FORM_B_TREE_NAME}).select().single();
