@@ -243,7 +243,7 @@ async function loadTree(){
    const legacy=await supabaseClient.from('family_members').select('tree_id,created_by').eq('created_by',currentUser.id);
    if(!legacy.error&&Array.isArray(legacy.data)&&legacy.data.length){
     const counts={};
-    legacy.data.forEach(x=>{if(x.tree_id)counts[x.tree_id]=(counts[x.tree_id]||0)+1});
+    legacy.data.forEach(x=>{if(x.tree_id&&!formBTreeIds.has(x.tree_id))counts[x.tree_id]=(counts[x.tree_id]||0)+1});
     const ids=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
     for(const id of ids){
      const tr=await supabaseClient.from('family_trees').select('*').eq('id',id).maybeSingle();
