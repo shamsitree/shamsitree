@@ -402,10 +402,45 @@ function editMember(id){const m=members.find(x=>x.id===id);if(m)openMemberModal(
 function renderMembers(){const q=(document.getElementById('memberSearch')?.value||'').trim().toLowerCase(),tbody=membersTable;tbody.innerHTML='';const list=members.filter(m=>[m.full_name,m.gender,m.biradari,m.location,m.current_residence].join(' ').toLowerCase().includes(q));if(!list.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:30px">No family members found.</td></tr>';return}list.forEach(m=>{const tr=document.createElement('tr');tr.innerHTML='<td><b>'+esc(m.full_name)+'</b></td><td>'+esc(m.gender||'')+'</td><td>'+esc(m.date_of_birth||'')+'</td><td>'+esc(m.biradari||'')+'</td><td>'+esc(m.current_residence||m.location||'')+'</td><td><div class="actions"><button class="secondary" onclick="openDetailModal(\''+m.id+'\')">View</button><button class="secondary" onclick="editMember(\''+m.id+'\')">Edit</button><button class="danger" onclick="deleteMember(\''+m.id+'\')">Delete</button></div></td>';tbody.appendChild(tr)})}
 function parentIds(childId){return relationships.filter(r=>r.person_id===childId&&r.relation_type==='parent').map(r=>r.related_person_id)}
 function childrenOf(parentId){return relationships.filter(r=>r.related_person_id===parentId&&r.relation_type==='parent').map(r=>r.person_id)}
-function spouseOf(personId){const r=relationships.find(x=>x.person_id===personId&&x.relation_type==='spouse');return r?members.find(x=>x.id===r.related_person_id):null}
-function photoFor(m){if(m?.profile_photo){if(/^https?:\/\//i.test(m.profile_photo)||/^data:/i.test(m.profile_photo))return m.profile_photo;try{const r=supabaseClient.storage.from('family-photos').getPublicUrl(m.profile_photo);if(r?.data?.publicUrl)return r.data.publicUrl}catch(e){}}return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="#eef2f6"/><text x="50" y="58" text-anchor="middle" font-size="38">👤</text></svg>')}
-function treeCard(m,relation){const bir=m.biradari?'<div class="treeRelation">'+esc(m.biradari)+'</div>':'';return '<div class="treeCard" onclick="openDetailModal(\''+m.id+'\')"><img class="treePhoto" src="'+esc(photoFor(m))+'" alt=""><div class="treeName">'+esc(m.full_name)+'</div><div class="treeRelation">'+esc(relation||'Family member')+'</div>'+bir+'</div>'}
-function renderTree(){const c=treeContainer;if(!members.length){c.innerHTML='<div class="empty"><h3>Your family tree is empty.</h3><p>Add your first family member to begin.</p></div>';return}const rendered=new Set();function node(m,relation='Family member'){if(!m||rendered.has(m.id))return '';rendered.add(m.id);const spouse=spouseOf(m.id);if(spouse)rendered.add(spouse.id);const couple='<div class="treeCouple">'+treeCard(m,relation)+(spouse?'<div class="treeSpouseLabel">💍</div>'+treeCard(spouse,'Husband / Wife'):'')+'</div>';const ids=[...new Set([...childrenOf(m.id),...(spouse?childrenOf(spouse.id):[])])];const kids=ids.map(id=>members.find(x=>x.id===id)).filter(Boolean);let h='<div class="treeNode">'+couple;if(kids.length)h+='<div class="treeConnector">↓</div><div class="treeChildren">'+kids.map(k=>node(k,'Child')).join('')+'</div>';return h+'</div>'}let html='<div style="text-align:center;margin-bottom:15px"><b>'+esc(currentTree?.name||'My Family Tree')+'</b></div><div class="treeRoots">';members.filter(m=>parentIds(m.id).length===0).forEach(r=>{if(!rendered.has(r.id))html+=node(r)});members.forEach(m=>{if(!rendered.has(m.id))html+=node(m)});html+='</div>';c.innerHTML=html}
+function spousesOf(personId){const seen=new Set();return familyUnions.filter(u=>String(u.relationship_type||'spouse')==='spouse'&&(u.partner1_id===personId||u.partner2_id===personId)).map(u=>({union:u,person:members.find(m=>m.id===(u.partner1_id===personId?u.partner2_id:u.partner1_id))})).filter(x=>x.person&&!seen.has(x.person.id)&&seen.add(x.person.id))}
+function spouseOf(personId){return spousesOf(personId)[0]?.person||null}
+function photoFor(m){if(m?.profile_photo){if(/^https?:\\/\\//i.test(m.profile_photo)||/^data:/i.test(m.profile_photo))return m.profile_photo;try{const r=supabaseClient.storage.from('family-photos').getPublicUrl(m.profile_photo);if(r?.data?.publicUrl)return r.data.publicUrl}catch(e){}}return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="#eef2f6"/><text x="50" y="58" text-anchor="middle" font-size="38">👤</text></svg>')}
+function treeCard(m,relation){const bir=m.biradari?'<div class="treeRelation">'+esc(m.biradari)+'</div>':'';return '<div class="treeCard" onclick="openDetailModal(\\''+m.id+'\\')"><img class="treePhoto" src="'+esc(photoFor(m))+'" alt=""><div class="treeName">'+esc(m.full_name)+'</div><div class="treeRelation">'+esc(relation||'Family member')+'</div>'+bir+'</div>'}
+function renderTree(){
+ const c=treeContainer;
+ if(!members.length){c.innerHTML='<div class="empty"><h3>Your family tree is empty.</h3><p>Add your first family member to begin.</p></div>';return}
+ const personById=id=>members.find(m=>m.id===id);
+ const childrenForUnion=unionId=>familyChildren.filter(fc=>fc.family_union_id===unionId).map(fc=>personById(fc.child_id)).filter(Boolean);
+ const spouseUnionsFor=id=>familyUnions.filter(u=>String(u.relationship_type||'spouse')==='spouse'&&(u.partner1_id===id||u.partner2_id===id));
+ const parentUnionChildren=id=>familyUnions.filter(u=>String(u.relationship_type||'')!=='spouse'&&(u.partner1_id===id||u.partner2_id===id)).flatMap(u=>childrenForUnion(u.id));
+ const renderedRoots=new Set();
+ function renderPerson(m,relation='Family member',path=new Set()){
+  if(!m||path.has(m.id))return '';
+  const nextPath=new Set(path);nextPath.add(m.id);
+  const unions=spouseUnionsFor(m.id);
+  let h='<div class="treeNode"><div class="treeCouple">'+treeCard(m,relation)+'</div>';
+  if(unions.length){
+   h+='<div class="treeConnector">↓</div><div class="treeChildren treeSpouseBranches">';
+   for(const u of unions){
+    const partnerId=u.partner1_id===m.id?u.partner2_id:u.partner1_id;
+    const partner=personById(partnerId);
+    h+='<div class="treeNode treeUnionBranch"><div class="treeCouple">'+(partner?treeCard(partner,'Husband / Wife'):'')+'</div>';
+    const kids=childrenForUnion(u.id);
+    if(kids.length)h+='<div class="treeConnector">↓</div><div class="treeChildren">'+kids.map(k=>renderPerson(k,'Child',nextPath)).join('')+'</div>';
+    h+='</div>';
+   }
+   h+='</div>';
+  }
+  const singleKids=parentUnionChildren(m.id).filter(k=>!familyChildren.some(fc=>{const u=familyUnions.find(x=>x.id===fc.family_union_id);return fc.child_id===k.id&&u&&String(u.relationship_type||'')==='spouse'}));
+  if(singleKids.length)h+='<div class="treeConnector">↓</div><div class="treeChildren">'+[...new Map(singleKids.map(k=>[k.id,k])).values()].map(k=>renderPerson(k,'Child',nextPath)).join('')+'</div>';
+  return h+'</div>';
+ }
+ let html='<div style="text-align:center;margin-bottom:15px"><b>'+esc(currentTree?.name||'My Family Tree')+'</b></div><div class="treeRoots">';
+ const roots=members.filter(m=>parentIds(m.id).length===0);
+ roots.forEach(r=>{if(!renderedRoots.has(r.id)){html+=renderPerson(r);renderedRoots.add(r.id)}});
+ members.forEach(m=>{if(!renderedRoots.has(m.id)){html+=renderPerson(m);renderedRoots.add(m.id)}});
+ html+='</div>';c.innerHTML=html;
+}
 function openDetailModal(id){const m=members.find(x=>x.id===id);if(!m)return;detailTitle.textContent=m.full_name;const parents=parentIds(id).map(pid=>members.find(x=>x.id===pid)).filter(Boolean),spouse=relationships.find(r=>r.person_id===id&&r.relation_type==='spouse'),sp=spouse?members.find(x=>x.id===spouse.related_person_id):null;detailContent.innerHTML='<div class="photoBox"><img class="detailPhoto" src="'+esc(photoFor(m))+'" alt=""><div><h3 style="margin:0 0 5px">'+esc(m.full_name)+'</h3><div class="muted">'+esc(m.biradari||'')+'</div></div></div><div class="detailGrid"><div class="detailItem"><strong>Gender</strong>'+esc(m.gender||'')+'</div><div class="detailItem"><strong>Date of Birth</strong>'+esc(m.date_of_birth||'Not provided')+'</div><div class="detailItem"><strong>Birthplace</strong>'+esc(m.birthplace||'Not provided')+'</div><div class="detailItem"><strong>Current Residence</strong>'+esc(m.current_residence||m.location||'Not provided')+'</div><div class="detailItem"><strong>Phone</strong>'+esc(m.phone||'Not provided')+'</div><div class="detailItem"><strong>Parents</strong>'+esc(parents.map(x=>x.full_name).join(', ')||'Not provided')+'</div><div class="detailItem"><strong>Husband / Wife</strong>'+esc(sp?.full_name||'Not provided')+'</div><div class="detailItem"><strong>Notes / Family History</strong>'+esc(m.notes||'Not provided')+'</div></div>';detailEditButton.onclick=()=>{closeDetailModal();openMemberModal(m)};detailModal.style.display='block'}
 function closeDetailModal(){detailModal.style.display='none'}
 function searchMembers(){const q=searchInput.value.trim().toLowerCase();const list=members.filter(m=>[m.full_name,m.biradari,m.location,m.current_residence,m.birthplace,m.notes].join(' ').toLowerCase().includes(q));searchResults.innerHTML=list.map(m=>'<div class="resultCard" onclick="openDetailModal(\''+m.id+'\')"><b>'+esc(m.full_name)+'</b><div class="muted small">'+esc(m.biradari||'')+' • '+esc(m.current_residence||m.location||'')+'</div></div>').join('')||'<div class="empty">No matching family members.</div>'}
