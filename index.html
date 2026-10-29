@@ -416,6 +416,7 @@ function renderTree(){
  const renderedRoots=new Set();
  function renderPerson(m,relation='Family member',path=new Set()){
   if(!m||path.has(m.id))return '';
+  renderedRoots.add(m.id);
   const nextPath=new Set(path);nextPath.add(m.id);
   const unions=spouseUnionsFor(m.id);
   let h='<div class="treeNode"><div class="treeCouple">'+treeCard(m,relation)+'</div>';
@@ -424,6 +425,7 @@ function renderTree(){
    for(const u of unions){
     const partnerId=u.partner1_id===m.id?u.partner2_id:u.partner1_id;
     const partner=personById(partnerId);
+    if(partner)renderedRoots.add(partner.id);
     h+='<div class="treeNode treeUnionBranch"><div class="treeCouple">'+(partner?treeCard(partner,'Husband / Wife'):'')+'</div>';
     const kids=childrenForUnion(u.id);
     if(kids.length)h+='<div class="treeConnector">↓</div><div class="treeChildren">'+kids.map(k=>renderPerson(k,'Child',nextPath)).join('')+'</div>';
