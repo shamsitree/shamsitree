@@ -46,7 +46,8 @@ export const KinshipFinder: React.FC<KinshipFinderProps> = ({
       selectB: "Select Second Person (Person B)",
       swap: "Swap Persons",
       resultHeading: "Relationship Findings",
-      forwardRelation: "Relation from Person A to Person B",
+      forwardRelation: "Person A’s relationship to Person B",
+      relationTo: "— relationship to",
       reverseRelation: "Relation from Person B to Person A",
       degree: "Generational Distance",
       pathHeading: "Genealogical Path",
@@ -61,6 +62,7 @@ export const KinshipFinder: React.FC<KinshipFinderProps> = ({
       swap: "افراد کو تبدیل کریں",
       resultHeading: "رشتہ داری کے نتائج",
       forwardRelation: "فرد (الف) کا فرد (ب) سے رشتہ",
+      relationTo: "— رشتہ بہ",
       reverseRelation: "فرد (ب) کا فرد (الف) سے رشتہ",
       degree: "فاصلہ (درجات)",
       pathHeading: "خاندانی سلسلہ و شجرہ",
@@ -75,6 +77,7 @@ export const KinshipFinder: React.FC<KinshipFinderProps> = ({
       swap: "स्थान बदलें",
       resultHeading: "रिश्ता परिणाम",
       forwardRelation: "व्यक्ति A का व्यक्ति B से रिश्ता",
+      relationTo: "— रिश्ता इनसे",
       reverseRelation: "व्यक्ति B का व्यक्ति A से रिश्ता",
       degree: "पीढ़ियों की दूरी",
       pathHeading: "वंशावली पथ",
@@ -213,16 +216,16 @@ export const KinshipFinder: React.FC<KinshipFinderProps> = ({
                 {t.forwardRelation}
               </div>
               <div className="text-sm text-gray-600 mb-1">
-                <b className="text-gray-900">{personA?.full_name}</b> is the:
+                <b className="text-gray-900">{personA?.full_name}</b> {t.relationTo} <b className="text-gray-900">{personB?.full_name}</b>:
               </div>
               <div className="text-2xl font-black text-emerald-950 mt-1">
-                {result.relationshipEn}
+                {result.reverseRelationshipEn}
               </div>
               <div className="text-lg font-bold text-emerald-800 mt-1">
-                {result.relationshipUr}
+                {result.reverseRelationshipUr}
               </div>
               <div className="text-sm font-medium text-emerald-700 mt-0.5">
-                {result.relationshipHi}
+                {result.reverseRelationshipHi}
               </div>
             </div>
 
@@ -232,16 +235,16 @@ export const KinshipFinder: React.FC<KinshipFinderProps> = ({
                 {t.reverseRelation}
               </div>
               <div className="text-sm text-gray-600 mb-1">
-                <b className="text-gray-900">{personB?.full_name}</b> is the:
+                <b className="text-gray-900">{personB?.full_name}</b> {t.relationTo} <b className="text-gray-900">{personA?.full_name}</b>:
               </div>
               <div className="text-2xl font-black text-teal-950 mt-1">
-                {result.reverseRelationshipEn}
+                {result.relationshipEn}
               </div>
               <div className="text-lg font-bold text-teal-800 mt-1">
-                {result.reverseRelationshipUr}
+                {result.relationshipUr}
               </div>
               <div className="text-sm font-medium text-teal-700 mt-0.5">
-                {result.reverseRelationshipHi}
+                {result.relationshipHi}
               </div>
             </div>
           </div>
