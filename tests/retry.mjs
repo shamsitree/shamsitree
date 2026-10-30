@@ -1,0 +1,7 @@
+import {readFileSync} from 'node:fs';import {stripTypeScriptTypes} from 'node:module';import assert from 'node:assert/strict';
+const code=stripTypeScriptTypes(readFileSync(new URL('../src/utils/createMemberOnce.ts',import.meta.url),'utf8')).replace('export ','');const create=new Function(code+';return createMemberOnce')();
+const payload={id:'stable',tree_id:'tree',full_name:'Abdul Ghani'};
+function mock(mode){let row=null,inserts=0;return {get inserts(){return inserts},from(){let action='read',body;const q={select(){return q},eq(){return q},maybeSingle(){return q},single(){return q},insert(p){action='insert';body=p;return q},update(p){action='update';body=p;return q},then(resolve){if(action==='insert'){inserts++;row={...body};if(mode==='lost'){mode='ok';return resolve({error:new Error('Lost response')})}if(mode==='race')return resolve({error:{code:'23505'}})}if(action==='update')row={...row,...body};resolve({data:row,error:null})}};return q}}}
+let db=mock('ok');assert.equal((await create(db,payload)).id,'stable');console.log('PASS initial create');await create(db,{...payload,full_name:'Updated'});assert.equal(db.inserts,1);console.log('PASS retry reuses member');
+db=mock('lost');await assert.rejects(()=>create(db,payload));await create(db,payload);assert.equal(db.inserts,1);console.log('PASS lost response retry');
+db=mock('race');assert.equal((await create(db,payload)).id,'stable');assert.equal(db.inserts,1);console.log('PASS duplicate-key recovery');

@@ -1,0 +1,16 @@
+# Phase 2 technical and test report
+## Status: partial implementation; NOT production-ready
+Continues Corrected Review without discarding existing changes. React entry src/main.tsx retains normal App and adds an explicit ?demo=phase2 route via lazy import. Standalone HTML unchanged.
+
+New relationshipWorkspace.ts is an executable, isolated in-memory command implementation, NOT a Supabase adapter. Supports existing-person reuse by ID, child-only parentage reassignment without overwriting shared unions, ancestry checks, distinct parentage kinds, maximum three co-parent partners, optimistic version checks, request idempotency, authorization by simulated actor, proposals/recipient approval/rejection/cancellation, and combined parent lookup. Partner count currently counts co-parents, not a fully modeled marriage history. Names never merge identities. Candidate discovery is a scoped substring demo, not production private search. Client-supplied scope/actors must never serve as production authorization.
+
+Family example: original 16 checks include Abdul Mannan -> Anwar Kamal; Anwar/Ruhi Kamal -> Abdul Ghani; Anwar/Ruhi Fakhir -> Sidra Kamal. Engine returns paternal half-siblings. New tests check separate parents and safe child reassignment without changing Sidra or shared marriage records.
+
+Two-family demonstration: npm ci, npm run dev, open http://localhost:3000/?demo=phase2. Family A proposes Anwar -> Abdul Ghani in B; only simulated B approves; approved edge appears; cancellation removes edge while preserving both people. Refresh resets demo. This is interactive simulation, not persisted authenticated functionality.
+
+Executed: node tests/safety.mjs 16 PASS; node tests/phase2.mjs 16 PASS; npm run lint PASS; npm run build PASS. Build warning for __dirname config remains. New checks: original parents, reassignment, failed commit, idempotent retry, stale update, authorization, shared union protection, cycle, existing member reuse, pending proposal isolation, approval, sender self-approval rejection, rejection, cancellation, duplicates, scoped unverified discovery.
+Browser automation attempted but could not launch: Playwright Chromium executable missing. UI behavior unverified. No production write tests executed. Mock atomicity does not establish database atomicity. No multi-process concurrency test.
+
+Read-only Supabase metadata inspected on matching configured project qhobvzbjbsbtmorllnjz. Confirmed UUID identifiers and family_members/family_trees/family_unions/family_children columns. Existing tree_connection_requests has tree IDs, requested_by, status, message, timestamps but no person endpoints. tree_connections has tree IDs, connection_type, created_by, timestamp but no person endpoints. Constraints, RLS and existing functions still require inspection. No data rows read or modified.
+
+Remaining: live App still has guarded Father/Mother quick-add and existing-parent reassignment; partial saves/retries remain unsafe; no complete Form A/B split; no production person-identity linking or private discovery; no live relationship replacement/deletion completion. New core is not wired into existing live save path. This archive is a development milestone, not completion of all requested features. No deployment, push or production mutation occurred.
