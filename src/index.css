@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .5; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #059669; outline-offset: 3px; }
+.print-register { display: none; }
+@media print {
+  @page { size: A4; margin: 12mm; }
+  .no-print, nav, .tree-canvas, header { display: none !important; }
+  .print-register { display: block; color: black; }
+  .print-register h1 { font-size: 22pt; margin-bottom: 8mm; }
+  .print-branch { border: 1px solid #777; padding: 5mm; margin-bottom: 5mm; break-inside: avoid; }
+  .print-branch h2 { font-size: 14pt; font-weight: bold; }
+  .print-branch li { margin: 2mm 0; }
+  main { max-width: none !important; padding: 0 !important; }
+}

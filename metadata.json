@@ -1,0 +1,6 @@
+{
+  "name": "ShamsiTree 7.7 Unified",
+  "description": "Unified family tree, members directory, relationship engine, and memories management system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
