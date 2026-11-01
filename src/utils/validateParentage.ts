@@ -5,8 +5,11 @@ export function validateParentage(childId: string, parentIds: string[], unions: 
   if (parentIds.includes(childId)) throw new Error('A person cannot be their own parent.');
   const descendants = new Set<string>();
   const queue = [childId];
+  const visited = new Set<string>();
   while (queue.length) {
     const id = queue.pop()!;
+    if (visited.has(id)) continue;
+    visited.add(id);
     for (const u of unions.filter(u => u.partner1_id === id || u.partner2_id === id)) {
       for (const link of children.filter(c => c.family_union_id === u.id)) {
         if (!descendants.has(link.child_id)) { descendants.add(link.child_id); queue.push(link.child_id); }
