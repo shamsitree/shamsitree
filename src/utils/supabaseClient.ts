@@ -1,8 +1,8 @@
 import { PREVIEW_ONLY, PREVIEW_MESSAGE } from './previewMode';
 import { createClient } from '@supabase/supabase-js';
 
-export const SUPABASE_URL = "https://qhobvzbjbsbtmorllnjz.supabase.co";
-export const SUPABASE_KEY = "sb_publishable_tRIMQFqiZu-tSRownnMMxQ_wjch-orJ";
+export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://qhobvzbjbsbtmorllnjz.supabase.co";
+export const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "sb_publishable_tRIMQFqiZu-tSRownnMMxQ_wjch-orJ";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, PREVIEW_ONLY ? {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
