@@ -13,50 +13,18 @@ export function printTree(): void {
 /**
  * Export tree canvas container as PNG
  */
-export function exportTreeToPNG(containerElement: HTMLElement | null, filename: string = 'shamsitree-export.png'): void {
-  if (!containerElement) return;
-
-  const svgElement = containerElement.querySelector('svg');
-  if (!svgElement) return;
-
-  const serializer = new XMLSerializer();
-  let svgString = serializer.serializeToString(svgElement);
-
-  // Add xmlns if missing
-  if (!svgString.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
-    svgString = svgString.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-  }
-
-  const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-  const URLObj = window.URL || window.webkitURL || window;
-  const blobURL = URLObj.createObjectURL(svgBlob);
-
-  const image = new Image();
-  image.onload = () => {
-    const canvas = document.createElement('canvas');
-    const scale = 2; // high resolution export
-    const bbox = svgElement.getBoundingClientRect();
-    canvas.width = (bbox.width || 1200) * scale;
-    canvas.height = (bbox.height || 800) * scale;
-
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.scale(scale, scale);
-      ctx.drawImage(image, 0, 0, bbox.width || 1200, bbox.height || 800);
-
-      const pngURL = canvas.toDataURL('image/png');
-      const downloadLink = document.createElement('a');
-      downloadLink.href = pngURL;
-      downloadLink.download = filename;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-    }
-    URLObj.revokeObjectURL(blobURL);
-  };
-  image.src = blobURL;
+export async function exportTreeToPNG(containerElement: HTMLElement | null, filename = 'shamsitree-export.png'): Promise<void> {
+ if(!containerElement)throw new Error('Open a tree before exporting.');
+ const {toPng}=await import('html-to-image');
+ const content=containerElement.firstElementChild as HTMLElement|null;
+ if(!content)throw new Error('No tree is available to export.');
+ const width=Math.ceil(Math.max(content.scrollWidth,content.getBoundingClientRect().width));
+ const height=Math.ceil(Math.max(content.scrollHeight,content.getBoundingClientRect().height));
+ // Keep browser canvas allocations bounded; export stays entirely on-device.
+ const ratio=Math.min(2,Math.sqrt(16000000/Math.max(1,width*height)),16384/Math.max(width,height));
+ await document.fonts.ready;
+ const data=await toPng(content,{width,height,pixelRatio:ratio,skipFonts:true,backgroundColor:'#ffffff',style:{transform:'none',width:width+'px',height:height+'px',overflow:'visible'}});
+ const link=document.createElement('a');link.download=filename;link.href=data;link.click();
 }
 
 /**

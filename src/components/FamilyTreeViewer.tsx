@@ -391,6 +391,8 @@ export const FamilyTreeViewer: React.FC<Props> = ({
 
   // Zoom & Pan for Studio Canvas
   const [zoom, setZoom] = useState(1);
+  const [exportBusy,setExportBusy]=useState(false);
+  const [exportError,setExportError]=useState('');
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
@@ -742,13 +744,11 @@ export const FamilyTreeViewer: React.FC<Props> = ({
               {/* PNG Export */}
               <button
                 type="button"
-                onClick={() =>
-                  exportTreeToPNG(treeContainerRef.current, `shamsitree-${selectedStyle}.png`)
-                }
+                disabled={exportBusy} onClick={async()=>{setExportBusy(true);setExportError('');try{await exportTreeToPNG(treeContainerRef.current,`shamsitree-${selectedStyle}.png`);}catch(e){setExportError(e instanceof Error?e.message:'Export failed.');}finally{setExportBusy(false);}}}
                 className="flex items-center gap-1 px-3 py-1 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-semibold"
               >
                 <Download size={14} />
-                <span>Save PNG</span>
+                <span>{exportBusy?'Preparing PNG…':'Save PNG'}</span>{exportError&&<span role="alert">{exportError}</span>}
               </button>
             </div>
           </div>
