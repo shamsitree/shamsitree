@@ -1,9 +1,9 @@
-import React,{lazy,Suspense,useEffect,useId,useMemo,useState} from 'react';
+import React,{useEffect,useId,useMemo,useState} from 'react';
 import type {FamilyMember,FamilyUnion,FamilyChild,SupportedLanguage} from '../types/family';
 import {photoFor} from '../utils/photoStorage';
 import {indexFamily,familyScene,type FamilyIndex} from '../utils/familyViewModel';
 import {Printer,Plus,TreePine,Images,GitBranch,Leaf,Heart} from 'lucide-react';
-const HeritageDecoration=lazy(()=>import('./HeritageDecoration'));
+
 type Mode='classic'|'heritage'|'album';
 interface Props{members:FamilyMember[];unions:FamilyUnion[];children:FamilyChild[];currentUserId?:string;language:SupportedLanguage;onSelectMember:(member:FamilyMember)=>void;onAddRelative:(member:FamilyMember,kind:'father'|'mother'|'spouse'|'child',union?:FamilyUnion)=>void;onOpenAddMember:()=>void;}
 interface CardProps{member:FamilyMember;focus?:boolean;label?:string;onChoose:(member:FamilyMember)=>void;mode:Mode;}
@@ -26,7 +26,7 @@ function FamilyScene({index,focusId,mode,depth,limit,simple,onChoose,onAddRelati
  const father=scene.parents.find(p=>p.gender==='male'),mother=scene.parents.find(p=>p.gender==='female');
  const addChild=()=>{if(scene.branches.length===1)onAddRelative(focus,'child',scene.branches[0].union);else if(scene.branches.length>1&&typeof document!=='undefined')document.getElementById(branchesId)?.scrollIntoView({behavior:'auto',block:'center'});else onAddRelative(focus,'child');};
  return <section className={`family-canvas view-${mode} ${simple?'simple-decoration':''}`} data-view={mode} aria-label={`${mode==='album'?'Family Album':mode==='heritage'?'Heritage':'Classic'} family tree`}>
-  {mode==='heritage'&&<Suspense fallback={null}><HeritageDecoration simple={simple}/></Suspense>}
+
   <div className="scene-heading"><span>{mode==='heritage'?'ROOTED IN LOVE':mode==='album'?'THE FAMILY COLLECTION':'FAMILY LINEAGE'}</span><h3>{mode==='heritage'?'Every branch, a story':mode==='album'?'A lifetime of belonging':'Our connected generations'}</h3><p>{mode==='heritage'?'From deep roots to new beginnings.':mode==='album'?'People, portraits and the chapters we share.':'Choose a relative to explore. Choose the focus card to open details.'}</p></div>
   <div className="tree-content">
    {scene.elders.length>0&&<div className="elder-section"><h4>Earlier generations</h4><div className="elder-row">{scene.elders.map(({member,via})=><PersonCard key={member.id} member={member} label={`Parent of ${via}`} mode={mode} onChoose={onChoose}/>)}</div></div>}
