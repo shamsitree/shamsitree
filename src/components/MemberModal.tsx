@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FamilyMember, Gender, ChildRelationshipType, FamilyUnion } from '../types/family';
 import { BIRADARI_OPTIONS } from '../data/initialShamsiData';
 import { photoFor, uploadFamilyPhotoXHR } from '../utils/photoStorage';
+import { SmartDateInput } from './form/SmartDateInput';
+import { PlaceAutocomplete } from './form/PlaceAutocomplete';
+import { todayISO, validateLifeDates } from '../utils/dateInput';
 import { X, Upload, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface MemberModalProps {
@@ -11,6 +14,7 @@ interface MemberModalProps {
   allMembers: FamilyMember[];
   onSave: (memberData: Partial<FamilyMember>, parentage?: { fatherId?: string; motherId?: string; spouseId?: string; relationshipType?: ChildRelationshipType }) => Promise<void>;
   userId?: string;
+  localPhotoOnly?: boolean;
   defaultRelation?: { targetMember: FamilyMember; relationType: 'father' | 'mother' | 'spouse' | 'child'; union?: FamilyUnion } | null;
 }
 
@@ -21,8 +25,12 @@ export const MemberModal: React.FC<MemberModalProps> = ({
   allMembers,
   onSave,
   userId,
-  defaultRelation
+  defaultRelation,
+  localPhotoOnly = false
 }) => {
+  const [dateErrors, setDateErrors] = useState({birth:'',death:''});
+  const onBirthError = useCallback((error:string)=>setDateErrors(prev=>prev.birth===error?prev:{...prev,birth:error}),[]);
+  const onDeathError = useCallback((error:string)=>setDateErrors(prev=>prev.death===error?prev:{...prev,death:error}),[]);
   const [draftId, setDraftId] = useState(() => crypto.randomUUID());
   const [fullName, setFullName] = useState('');
   const [gender, setGender] = useState<Gender>('male');
@@ -130,13 +138,18 @@ export const MemberModal: React.FC<MemberModalProps> = ({
       return;
     }
 
+    const dateError = dateErrors.birth || (isDeceased ? dateErrors.death : '') || validateLifeDates(dob,isDeceased?dod:'');
+    if(dateError){alert(dateError);return;}
     setIsSaving(true);
     setUploadError(null);
 
     try {
       let finalPhotoPath = profilePhoto;
 
-      if (selectedFile && userId) {
+      if (selectedFile && localPhotoOnly) {
+        if(!['image/jpeg','image/png','image/webp','image/gif'].includes(selectedFile.type)||selectedFile.size>2*1024*1024)throw new Error('Preview photos must be JPG, PNG, WEBP or GIF under 2 MB.');
+        finalPhotoPath = await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(new Error('Could not read photo.'));reader.readAsDataURL(selectedFile);});
+      } else if (selectedFile && userId) {
         setUploadProgress(10);
         try {
           const tempId = member?.id || draftId;
@@ -257,12 +270,7 @@ export const MemberModal: React.FC<MemberModalProps> = ({
               <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
                 Date of Birth
               </label>
-              <input
-                type="date"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none text-gray-900"
-              />
+              <SmartDateInput label="Date of Birth" value={dob} onChange={setDob} max={todayISO()} onErrorChange={onBirthError}/>
             </div>
 
             <div>
@@ -281,13 +289,7 @@ export const MemberModal: React.FC<MemberModalProps> = ({
                 </label>
               </div>
               {isDeceased ? (
-                <input
-                  type="date"
-                  value={dod}
-                  onChange={(e) => setDod(e.target.value)}
-                  placeholder="Date of Death"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none text-gray-900"
-                />
+                <SmartDateInput label="Date of Death" value={dod} onChange={setDod} min={dob||undefined} max={todayISO()} onErrorChange={onDeathError}/>
               ) : (
                 <div className="px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-500 text-xs">
                   Living (حیات ہیں)
@@ -299,26 +301,14 @@ export const MemberModal: React.FC<MemberModalProps> = ({
               <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
                 Birth City / Country
               </label>
-              <input
-                type="text"
-                value={birthplace}
-                onChange={(e) => setBirthplace(e.target.value)}
-                placeholder="e.g. Rampur, UP, India"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none text-gray-900"
-              />
+              <PlaceAutocomplete label="Birth City / Country" value={birthplace} onChange={setBirthplace}/>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
                 Current Residence
               </label>
-              <input
-                type="text"
-                value={currentResidence}
-                onChange={(e) => setCurrentResidence(e.target.value)}
-                placeholder="e.g. Delhi, India"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 outline-none text-gray-900"
-              />
+              <PlaceAutocomplete label="Current Residence" value={currentResidence} onChange={setCurrentResidence}/>
             </div>
 
             <div>
@@ -472,7 +462,7 @@ export const MemberModal: React.FC<MemberModalProps> = ({
             </button>
             <button
               type="submit"
-              disabled={isSaving}
+              disabled={isSaving || !!dateErrors.birth || (isDeceased && !!dateErrors.death)}
               className="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold transition flex items-center gap-2 cursor-pointer shadow-xs"
             >
               {isSaving && <RefreshCw className="w-4 h-4 animate-spin" />}
