@@ -423,7 +423,7 @@ export const FamilyTreeViewer: React.FC<Props> = ({
     return getFilteredMembers(studioSourceMap, filter);
   }, [studioSourceMap, filter]);
 
-  useEffect(()=>{if(typeof requestAnimationFrame==='undefined')return;const frame=requestAnimationFrame(()=>{treeContainerRef.current?.querySelector('foreignObject')?.scrollIntoView({block:'nearest',inline:'center'});});return()=>cancelAnimationFrame(frame);},[selectedStyle,visibleStudioMembers]);
+  useEffect(()=>{if(typeof requestAnimationFrame==='undefined')return;const frame=requestAnimationFrame(()=>{const canvas=treeContainerRef.current;const target=canvas?.querySelector('foreignObject');if(canvas&&target){const c=canvas.getBoundingClientRect(),t=target.getBoundingClientRect();canvas.scrollTo({left:canvas.scrollLeft+t.left-c.left-(canvas.clientWidth-t.width)/2,top:canvas.scrollTop+t.top-c.top-32,behavior:'auto'});}});return()=>cancelAnimationFrame(frame);},[selectedStyle,visibleStudioMembers]);
 
   const totalMembersCount = Object.keys(studioSourceMap).length;
   const visibleMembersCount = Object.keys(visibleStudioMembers).filter(
