@@ -937,6 +937,9 @@ export const FamilyTreeViewer: React.FC<Props> = ({
             name,
             description: desc,
             styleId: selectedStyle,
+            includeSpouses: filter.includeSpouses,
+            minGeneration: filter.minGeneration,
+            maxGeneration: filter.maxGeneration,
             startPersonId: filter.startPersonId,
             endPersonId: filter.endPersonId,
             selectedMemberIds: [...filter.selectedMemberIds],
@@ -952,9 +955,10 @@ export const FamilyTreeViewer: React.FC<Props> = ({
             startPersonId: v.startPersonId,
             endPersonId: v.endPersonId,
             selectedMemberIds: v.selectedMemberIds,
+            minGeneration:v.minGeneration, maxGeneration:v.maxGeneration,
             generationLimit: v.generationLimit,
             activeMarriageBranches: v.activeMarriageBranches || {},
-            includeSpouses: true,
+            includeSpouses: v.includeSpouses ?? false,
             includeBridgeAncestors: v.includeBridgeAncestors ?? true,
           });
           if (v.styleId) setSelectedStyle(v.styleId);

@@ -174,6 +174,9 @@ export interface TreeViewFilter {
 }
 
 export interface CustomTreeView {
+  includeSpouses?: boolean;
+  minGeneration?: number;
+  maxGeneration?: number;
   id: string;
   name: string;
   description: string;
