@@ -46,7 +46,7 @@ export const StarryNightTree: React.FC<StarryNightProps> = ({
       {/* Cosmic Nebula Cloud Effect */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/40 via-purple-950/20 to-slate-950 pointer-events-none" />
 
-      <svg className="w-full h-full" viewBox={viewBox}>
+      <svg className="w-full h-full" viewBox={viewBox} width={width + padding * 2} height={height + padding * 2} style={{width:width + padding * 2,height:height + padding * 2,maxWidth:'none'}}>
         <defs>
           <filter id="starGlow" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="4" result="blur" />

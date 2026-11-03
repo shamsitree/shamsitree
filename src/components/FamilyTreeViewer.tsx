@@ -758,7 +758,7 @@ export const FamilyTreeViewer: React.FC<Props> = ({
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            className={`flex-1 relative overflow-hidden tree-canvas-container ${
+            className={`flex-1 relative overflow-auto tree-canvas-container ${
               isPanning ? 'cursor-grabbing' : 'cursor-grab'
             }`}
           >

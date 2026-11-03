@@ -53,6 +53,8 @@ export const StyleGalleryModal: React.FC<StyleGalleryModalProps> = ({
 
             return (
               <div
+                role="button" tabIndex={0} aria-label={`Apply ${style.name}`}
+                onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onSelectStyle(style.id);onClose();}}}
                 key={style.id}
                 onClick={() => {
                   onSelectStyle(style.id);

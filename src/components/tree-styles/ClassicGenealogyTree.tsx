@@ -35,7 +35,7 @@ export const ClassicGenealogyTree: React.FC<ClassicTreeProps> = ({
 
   return (
     <div className="relative w-full h-full select-none">
-      <svg className="w-full h-full min-h-[750px]" viewBox={viewBox}>
+      <svg className="w-full h-full min-h-[750px]" viewBox={viewBox} width={width + padding * 2} height={height + padding * 2} style={{width:width + padding * 2,height:height + padding * 2,maxWidth:'none'}}>
         <defs>
           <linearGradient id="classicConnector" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.8" />

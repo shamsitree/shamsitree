@@ -35,7 +35,7 @@ export const VintageScrollTree: React.FC<VintageScrollProps> = ({
   return (
     <div className="relative w-full h-full min-h-[800px] bg-[#e8d8be] select-none p-4">
       {/* Scroll Roll Edges & Texture */}
-      <svg className="w-full h-full" viewBox={viewBox}>
+      <svg className="w-full h-full" viewBox={viewBox} width={width + padding * 2} height={height + padding * 2} style={{width:width + padding * 2,height:height + padding * 2,maxWidth:'none'}}>
         <defs>
           <filter id="inkBleed" x="-10%" y="-10%" width="120%" height="120%">
             <feGaussianBlur stdDeviation="0.6" result="blur" />

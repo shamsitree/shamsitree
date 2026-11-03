@@ -38,7 +38,7 @@ export const PhotoAlbumTree: React.FC<PhotoAlbumTreeProps> = ({
       {/* Textured Linen Canvas Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(#d6c7b2_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none" />
 
-      <svg className="w-full h-full" viewBox={viewBox}>
+      <svg className="w-full h-full" viewBox={viewBox} width={width + padding * 2} height={height + padding * 2} style={{width:width + padding * 2,height:height + padding * 2,maxWidth:'none'}}>
         <defs>
           <filter id="albumDropShadow" x="-15%" y="-15%" width="130%" height="130%">
             <feDropShadow dx="2" dy="6" stdDeviation="5" floodOpacity="0.22" />

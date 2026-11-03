@@ -38,7 +38,7 @@ export const RoyalHeritageTree: React.FC<RoyalHeritageTreeProps> = ({
       {/* Subtle parchment grain overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none" />
 
-      <svg className="w-full h-full" viewBox={viewBox}>
+      <svg className="w-full h-full" viewBox={viewBox} width={width + padding * 2} height={height + padding * 2} style={{width:width + padding * 2,height:height + padding * 2,maxWidth:'none'}}>
         <defs>
           {/* Antique Gold Gradient */}
           <linearGradient id="royalGold" x1="0%" y1="0%" x2="100%" y2="100%">

@@ -36,7 +36,7 @@ export const ModernMinimalistTree: React.FC<ModernMinimalistProps> = ({
       {/* Precision Grid Blueprint */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:40px_40px] opacity-40 pointer-events-none" />
 
-      <svg className="w-full h-full" viewBox={viewBox}>
+      <svg className="w-full h-full" viewBox={viewBox} width={width + padding * 2} height={height + padding * 2} style={{width:width + padding * 2,height:height + padding * 2,maxWidth:'none'}}>
         {/* Orthogonal Metro-style Connector Lines */}
         {layout.connections.map((conn) => {
           const midY = (conn.fromY + conn.toY) / 2;
