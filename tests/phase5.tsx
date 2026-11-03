@@ -12,6 +12,7 @@ import {indexFamily,familyScene} from '../src/utils/familyViewModel';
 import {KinshipEngine} from '../src/utils/kinshipEngine';
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT=true;
 let passed=0;
+const watchdog=setTimeout(()=>{console.error('FAIL Phase5 suite did not finish');process.exit(1);},30000);
 async function test(name:string,fn:()=>unknown){await fn();passed++;console.log('PASS Phase5',name);}
 await test('manual Indian dates preserve ISO calendar day',()=>{assert.equal(parseDateInput('19/04/1980').iso,'1980-04-19');assert.equal(displayDate('1980-04-19'),'19/04/1980');assert.equal(parseDateInput('1-2-2000').iso,'2000-02-01');});
 await test('leap-year and invalid dates reject rollover',()=>{assert.ok(validISODate('2000-02-29'));assert.ok(!validISODate('1900-02-29'));assert.ok(!validISODate('2025-02-29'));assert.ok(parseDateInput('31/04/2000').error);assert.ok(parseDateInput('01/01/0000').error);});
@@ -39,7 +40,7 @@ await test('place selection works with keyboard and keeps arbitrary manual input
 });
 await test('online lookup is opt-in, debounced and aborts on unmount',async()=>{
  const original=globalThis.fetch;let calls=0,signal:AbortSignal|undefined,view:any;
- globalThis.fetch=(async(_url:any,options:any)=>{calls++;signal=options.signal;return new Promise(()=>{});}) as any;
+ globalThis.fetch=(async(_url:any,options:any)=>{calls++;signal=options.signal;return {ok:true,json:async()=>({features:[]})};}) as any;
  function Harness(){const [v,setV]=useState('Unknown Village');return <PlaceAutocomplete label="Online" value={v} onChange={setV}/>;}
  try{await act(async()=>{view=create(<Harness/>);});assert.equal(calls,0);
  await act(async()=>view.root.findByProps({type:'checkbox'}).props.onChange({target:{checked:true}}));assert.equal(calls,0);
@@ -78,4 +79,4 @@ await test('large-family scene is bounded and indexing is linear',()=>{
  const start=performance.now();const index=indexFamily(family.members,family.unions,family.children);const scene=familyScene(index,'anwar',2,20);const elapsed=performance.now()-start;
  assert.equal(scene.branches.find(b=>b.union.id==='marriage1')!.kids.length,20);assert.equal(scene.branches.find(b=>b.union.id==='marriage1')!.total,1201);assert.ok(elapsed<1000);console.log(`PERF 1209 members: index + bounded scene ${elapsed.toFixed(2)} ms`);
 });
-console.log(`${passed} Phase 5 checks passed`);
+assert.equal(passed,14);clearTimeout(watchdog);console.log(`${passed} Phase 5 checks passed`);
