@@ -421,6 +421,8 @@ export const FamilyTreeViewer: React.FC<Props> = ({
     return getFilteredMembers(studioSourceMap, filter);
   }, [studioSourceMap, filter]);
 
+  useEffect(()=>{if(typeof requestAnimationFrame==='undefined')return;const frame=requestAnimationFrame(()=>{treeContainerRef.current?.querySelector('foreignObject')?.scrollIntoView({block:'nearest',inline:'center'});});return()=>cancelAnimationFrame(frame);},[selectedStyle,visibleStudioMembers]);
+
   const totalMembersCount = Object.keys(studioSourceMap).length;
   const visibleMembersCount = Object.keys(visibleStudioMembers).filter(
     (id) => !bridgeIds.has(id)

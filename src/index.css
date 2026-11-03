@@ -59,3 +59,6 @@
     position: static !important;
   }
 }
+
+.tree-canvas-container{height:75vh;min-height:480px;max-height:900px;flex:none!important;overscroll-behavior:contain}
+@media print{.tree-canvas-container{height:auto;max-height:none;overflow:visible}}
