@@ -21,3 +21,20 @@
 @media(prefers-reduced-motion:reduce){.phase5-tree *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media print{body{background:white!important}.tree-toolbar,.tree-options,.root-actions,.branch-add,.show-more,.add-parent,.sandbox-banner,.sandbox-actions,nav,header{display:none!important}.family-canvas{border:0!important;overflow:visible!important;min-height:0;box-shadow:none!important;padding:0!important;background:white!important}.heritage-decoration{opacity:.18}.person-card,.marriage-branch,.view-album .focus-section{break-inside:avoid;box-shadow:none!important}.person-card{border:1px solid #999!important}.view-album .person-card{transform:none!important}.scene-heading{margin-bottom:15px}.marriage-grid{display:flex!important;flex-wrap:wrap;justify-content:center;gap:14px!important}.marriage-branch{flex:1 1 220px}.person-name{color:#000!important}.tree-content{max-width:none}.elder-row{gap:8px}}
 .sandbox-banner{background:#fff7dc;border-bottom:1px solid #ecdba5;color:#695321;display:flex;justify-content:center;gap:16px;flex-wrap:wrap;padding:10px 16px;font-size:11px}.sandbox-banner strong{letter-spacing:.13em}.sandbox-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 18px}.sandbox-actions p{flex:1;font-size:12px;color:#67786d;min-width:200px}.sandbox-actions button{padding:9px 12px;background:white;border:1px solid #cddbcf;border-radius:9px;font-size:12px;color:#2c664c}.sandbox-actions button:first-of-type{background:#176b51;color:white}.sandbox-message{padding:10px 14px;background:#e5f4e9;color:#285b3c;font-size:12px;border-radius:9px;margin:10px 0}.sample-directory{padding:24px;background:white;border:1px solid #dde5dd;border-radius:16px}.sample-directory h2{font-size:22px;font-weight:700;margin-bottom:15px}.sample-directory article{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-top:1px solid #e5ece4;padding:12px 0;font-size:12px}.sample-directory article strong{min-width:140px}.sample-directory article span{flex:1;color:#687d6d}.sample-directory button{padding:8px 12px;border:1px solid #d4e0d5;border-radius:8px;color:#286b4a}
+
+/* Phase 5 refinement: botanical connectors belong to the genealogy layout,
+   rather than placing unrelated name boxes on top of a tree illustration. */
+.view-heritage .tree-content{gap:0}
+.view-heritage .parents-section,.view-heritage .focus-section,.view-heritage .branch-section{position:relative}
+.view-heritage .parents-row:after,.view-heritage .marriage-grid:before{background:linear-gradient(90deg,transparent,#66824d 15%,#66824d 85%,transparent);height:4px;border-radius:100%}
+.view-heritage .root-connector{width:8px;background:linear-gradient(90deg,#8b704d,#526e40,#9d8355);border-radius:12px;height:42px}
+.view-heritage .marriage-branch{background:linear-gradient(145deg,#fdfcf2f5,#edf3e6ed);border:2px solid #a9be8e;box-shadow:0 8px 24px #496c3620}
+.view-heritage .marriage-branch:before{width:7px;background:#718b53;border-radius:6px}
+.view-heritage .person-card{background:linear-gradient(145deg,#fffef5,#f1f6e7);border:2px solid #a4bc89;box-shadow:0 7px 20px #42642c20;transform:none}
+.view-heritage .person-card:after{content:'';position:absolute;bottom:-7px;left:calc(50% - 7px);width:14px;height:14px;border-radius:1px 100% 1px 100%;transform:rotate(45deg);background:#88a76c;opacity:.65;pointer-events:none}
+.view-heritage .person-card:hover{box-shadow:0 10px 24px #42642c30;border-color:#628b4c}
+.view-heritage .children-connector{background:#77935d;width:4px;border-radius:6px}
+.view-heritage .branch-children{gap:16px}
+.view-heritage .branch-add{position:relative;z-index:2}
+@media(max-width:650px){.view-heritage .root-connector{height:30px}.view-heritage .marriage-grid{gap:26px}}
+@media print{.view-heritage .person-card:after{display:none}}
