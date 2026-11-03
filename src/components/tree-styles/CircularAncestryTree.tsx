@@ -23,10 +23,6 @@ export const CircularAncestryTree: React.FC<CircularAncestryProps> = ({
   rootPersonId = 'abdul-mannan',
 }) => {
   const memberList = Object.values(members);
-  const size = 1100;
-  const centerX = size / 2;
-  const centerY = size / 2;
-
   // Group by generation
   const genGroups: Record<number, Person[]> = {};
   memberList.forEach((m) => {
@@ -39,22 +35,18 @@ export const CircularAncestryTree: React.FC<CircularAncestryProps> = ({
     .map(Number)
     .sort((a, b) => a - b);
 
-  // Orbit Radii
-  const radiusMap: Record<number, number> = {
-    1: 0, // center
-    2: 170,
-    3: 310,
-    4: 430,
-    5: 520,
-  };
-
+  // Each orbit has enough circumference for its actual member count.
+  const radiusMap:Record<number,number>={};let previous=-170;
+  sortedGens.forEach(gen=>{const count=genGroups[gen].length;const radius=sortedGens.length===1&&count===1?0:Math.max(previous+170,count*160/(2*Math.PI),170);radiusMap[gen]=radius;previous=radius;});
+  const size=Math.max(1100,2*(Math.max(0,...Object.values(radiusMap))+130));
+  const centerX=size/2,centerY=size/2;
   const coords = new Map<string, { x: number; y: number; r: number; angle: number }>();
 
   sortedGens.forEach((gen) => {
     const list = genGroups[gen];
     const r = radiusMap[gen] || 160 * (gen - 1);
 
-    if (gen === 1 && list.length === 1) {
+    if (r === 0 && list.length === 1) {
       coords.set(list[0].id, { x: centerX, y: centerY, r: 0, angle: 0 });
     } else {
       const count = list.length;
@@ -70,7 +62,7 @@ export const CircularAncestryTree: React.FC<CircularAncestryProps> = ({
 
   return (
     <div className="relative w-full h-full min-h-[850px] bg-slate-900 overflow-hidden select-none">
-      <svg className="w-full h-full" viewBox={`0 0 ${size} ${size}`}>
+      <svg className="w-full h-full" viewBox={`0 0 ${size} ${size}`} width={size} height={size} style={{width:size,height:size,maxWidth:'none'}}>
         <defs>
           <radialGradient id="sunburstGrad" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#1e3a8a" stopOpacity="0.8" />

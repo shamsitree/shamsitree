@@ -160,14 +160,14 @@ export const NaturalLivingTree: React.FC<NaturalLivingTreeProps> = ({
         />
 
         {/* ================= ORGANIC BRANCHES TO MEMBERS ================= */}
-        {memberList.map((person) => {
+        {memberList.flatMap(person=>{const parents=person.parentIds.filter(id=>nodeCoords.has(id));return (parents.length?parents:[undefined]).map(parentId=>({person,parentId}));}).map(({person,parentId}) => {
           const coord = nodeCoords.get(person.id);
           if (!coord) return null;
 
           // If person has parents, branch splits from parent
           let startPt = { x: trunkBaseX, y: crownY };
-          if (person.parentIds.length > 0) {
-            const parentCoord = nodeCoords.get(person.parentIds[0]);
+          if (parentId) {
+            const parentCoord = nodeCoords.get(parentId);
             if (parentCoord) {
               startPt = { x: parentCoord.x, y: parentCoord.y };
             }
@@ -184,13 +184,14 @@ export const NaturalLivingTree: React.FC<NaturalLivingTreeProps> = ({
           const strokeW = Math.max(3, 14 - coord.gen * 2.2);
 
           return (
-            <g key={`branch-${person.id}`}>
+            <g key={`branch-${parentId||'decorative-root'}-${person.id}`} data-parent-id={parentId} data-child-id={parentId?person.id:undefined}>
               {/* Branch */}
               <path
                 d={branchPath}
                 fill="none"
                 stroke="url(#barkGradient)"
                 strokeWidth={strokeW}
+                strokeDasharray={parentId&&person.relationshipType!=='biological'?'8 5':undefined}
                 strokeLinecap="round"
                 filter="url(#woodShadow)"
               />

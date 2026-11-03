@@ -22,8 +22,9 @@ export const FanChartTree: React.FC<FanChartProps> = ({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const memberList = Object.values(members);
-  const width = 1200;
-  const height = 750;
+  const maxGeneration=Math.max(1,...memberList.map(p=>p.generation||1));
+  const width = Math.max(1200,(70+maxGeneration*110)*2+80);
+  const height = Math.max(750,70+maxGeneration*110+80);
   const originX = width / 2;
   const originY = height - 40;
 
@@ -35,7 +36,7 @@ export const FanChartTree: React.FC<FanChartProps> = ({
     genGroups[g].push(m);
   });
 
-  const gens = [1, 2, 3, 4, 5];
+  const gens = Array.from({length:maxGeneration},(_,i)=>i+1);
   const innerR = 70;
   const bandWidth = 110;
   // Span from 195 degrees to 345 degrees (150-degree fan) or 180 to 360 (180 semicircle)

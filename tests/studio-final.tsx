@@ -15,3 +15,14 @@ const files=['ClassicGenealogyTree','NaturalLivingTree','RoyalHeritageTree','Pho
 assert.equal(TREE_STYLES.length,13);
 for(const name of files){const m=await import('../src/components/tree-styles/'+name+'.tsx');const C=m[name];assert.ok(C,name);const html=renderToStaticMarkup(<C members={SAMPLE_MEMBERS} bridgeIds={new Set()} onSelectPerson={()=>{}}/>);assert.ok(html.length>100,name);if(name==='NaturalLivingTree'){const cards=[...html.matchAll(/<foreignObject[^>]*x="([^"]+)"[^>]*y="([^"]+)"[^>]*width="190"[^>]*height="90"/g)].map(m=>({x:Number(m[1]),y:Number(m[2])}));assert.equal(cards.length,100);for(let a=0;a<cards.length;a++)for(let b=a+1;b<cards.length;b++)assert.ok(Math.abs(cards[a].x-cards[b].x)>=190||Math.abs(cards[a].y-cards[b].y)>=90,'Natural tree cards overlap');}if(name==='ClassicGenealogyTree')assert.ok(html.includes('max-width:none'),'large tree must retain natural size');console.log('PASS render supplied style',name);}
 console.log('PASS real-ID 100-to-50 selection, clear, disconnected groups and no mutation');
+
+const {NaturalLivingTree}=await import('../src/components/tree-styles/NaturalLivingTree');
+const natural=renderToStaticMarkup(<NaturalLivingTree members={SAMPLE_MEMBERS} bridgeIds={new Set()} onSelectPerson={()=>{}}/>);
+for(const child of Object.values(SAMPLE_MEMBERS))for(const parent of child.parentIds){if(SAMPLE_MEMBERS[parent])assert.ok(natural.includes(`data-parent-id="${parent}" data-child-id="${child.id}"`),`missing natural parent edge ${parent}->${child.id}`);}
+const {CircularAncestryTree}=await import('../src/components/tree-styles/CircularAncestryTree');
+const circular=renderToStaticMarkup(<CircularAncestryTree members={SAMPLE_MEMBERS} bridgeIds={new Set()} onSelectPerson={()=>{}}/>);
+const positions=[...circular.matchAll(/<foreignObject[^>]*x="([^"]+)"[^>]*y="([^"]+)"/g)].map(m=>m[1]+','+m[2]);assert.equal(positions.length,100);assert.equal(new Set(positions).size,100);
+const {FanChartTree}=await import('../src/components/tree-styles/FanChartTree');
+const sixth={...Object.values(SAMPLE_MEMBERS)[0],id:'sixth-test',firstName:'BeyondFive',lastName:'Regression',generation:6,parentIds:[],spouses:[]};
+assert.ok(renderToStaticMarkup(<FanChartTree members={{...SAMPLE_MEMBERS,[sixth.id]:sixth}} bridgeIds={new Set()} onSelectPerson={()=>{}}/>).includes('BeyondFive'));
+console.log('PASS every natural parent edge, 100 distinct radial positions and sixth-generation fan member');
