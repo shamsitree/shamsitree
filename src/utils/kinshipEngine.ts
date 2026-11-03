@@ -15,6 +15,60 @@ export class KinshipEngine {
   private unions: FamilyUnion[] = [];
   private children: FamilyChild[] = [];
   private adjacency = new Map<string, GraphEdge[]>();
+  private biologicalEngine?: KinshipEngine;
+
+  /** A lineage path contains only parent edges or only child edges, never spouses. */
+  private lineagePath(from: string, to: string, direction: 'parent' | 'child'): FamilyMember[] | null {
+    const queue: { id: string; path: FamilyMember[] }[] = [{ id: from, path: [] }];
+    const visited = new Set([from]);
+    while (queue.length) {
+      const current = queue.shift()!;
+      for (const edge of this.adjacency.get(current.id) || []) {
+        if (edge.type !== direction || visited.has(edge.targetId)) continue;
+        const member = this.membersMap.get(edge.targetId);
+        if (!member) continue;
+        const path = [...current.path, member];
+        if (member.id === to) return path;
+        visited.add(member.id);
+        queue.push({ id: member.id, path });
+      }
+    }
+    return null;
+  }
+
+  private extendedLineageLabel(path: FamilyMember[], ancestor: boolean) {
+    const last = path[path.length - 1];
+    const male = last.gender === 'male', female = last.gender === 'female';
+    const greats = 'Great-'.repeat(path.length - 2);
+    const en = greats + (ancestor
+      ? (male ? 'Grandfather' : female ? 'Grandmother' : 'Grandparent')
+      : (male ? 'Grandson' : female ? 'Granddaughter' : 'Grandchild'));
+    // Descriptive chains retain the exact maternal/paternal route in both languages.
+    const ur = path.map((m, i) => ancestor
+      ? (i === 0 ? (m.gender === 'male' ? 'والد' : m.gender === 'female' ? 'والدہ' : 'والدین')
+        : (m.gender === 'male' ? 'کے والد' : m.gender === 'female' ? 'کی والدہ' : 'کے والدین'))
+      : (i === 0 ? (m.gender === 'male' ? 'بیٹے' : m.gender === 'female' ? 'بیٹی' : 'اولاد')
+        : (m.gender === 'male' ? (i === path.length - 1 ? 'کا بیٹا' : 'کے بیٹے') : m.gender === 'female' ? 'کی بیٹی' : 'کی اولاد'))).join(' ');
+    const hi = path.map((m, i) => ancestor
+      ? (i === 0 ? (m.gender === 'male' ? 'पिता' : m.gender === 'female' ? 'माता' : 'अभिभावक')
+        : (m.gender === 'male' ? 'के पिता' : m.gender === 'female' ? 'की माता' : 'के अभिभावक'))
+      : (i === 0 ? (m.gender === 'male' ? 'बेटे' : m.gender === 'female' ? 'बेटी' : 'संतान')
+        : (m.gender === 'male' ? (i === path.length - 1 ? 'का बेटा' : 'के बेटे') : m.gender === 'female' ? 'की बेटी' : 'की संतान'))).join(' ');
+    if (path.length === 3 && ancestor) {
+      const key = path.map(m => m.gender === 'male' ? 'F' : m.gender === 'female' ? 'M' : '?').join('');
+      const exact: Record<string, [string, string]> = {
+        FFF: ['پردادا', 'परदादा'], FFM: ['پردادی', 'परदादी'],
+        FMF: ['دادی کے والد', 'दादी के पिता'], FMM: ['دادی کی والدہ', 'दादी की माता'],
+        MFF: ['نانا کے والد', 'नाना के पिता'], MFM: ['نانا کی والدہ', 'नाना की माता'],
+        MMF: ['پرنانا', 'परनाना'], MMM: ['پرنانی', 'परनानी']
+      };
+      if (exact[key]) return { en, ur: exact[key][0], hi: exact[key][1] };
+    }
+    if (path.length === 3 && !ancestor && path.slice(0, 2).every(m => m.gender === 'male') && (male || female)) {
+      return { en, ur: male ? 'پڑپوتا' : 'پڑپوتی', hi: male ? 'परपोता' : 'परपोती' };
+    }
+    return { en, ur, hi };
+  }
 
   constructor(members: FamilyMember[], unions: FamilyUnion[], children: FamilyChild[]) {
     this.unions = unions;
@@ -214,6 +268,49 @@ export class KinshipEngine {
   }
 
   private identifyRelationship(a: FamilyMember, b: FamilyMember): { en: string; ur: string; hi: string; details?: string } {
+    const result = this.identifyBaseRelationship(a, b);
+    // Direct recorded parentage already has explicit adopted/foster/step labels.
+    const direct = (this.adjacency.get(a.id) || []).some(edge => edge.targetId === b.id);
+    if (direct || !this.children.some(c => c.relationship_type !== 'biological')) return result;
+
+    // Do not label an independently supported biological relationship as adoptive just
+    // because a shorter social path happens to pass through an adopted relative.
+    this.biologicalEngine ||= new KinshipEngine([...this.membersMap.values()], this.unions,
+      this.children.filter(c => c.relationship_type === 'biological'));
+    const biological = this.biologicalEngine.identifyBaseRelationship(a, b);
+    if (biological.en !== 'Extended Relative') return biological;
+
+    const path = this.findPath(a.id, b.id) || [];
+    const kinds = new Set<string>();
+    let previous = a.id;
+    for (const step of path) {
+      const edges = (this.adjacency.get(previous) || []).filter(edge => edge.targetId === step.personId && edge.type === step.stepType);
+      const edge = edges.find(edge => edge.meta?.relationshipType === 'biological') || edges[0];
+      if (edge?.meta?.relationshipType && edge.meta.relationshipType !== 'biological') kinds.add(edge.meta.relationshipType);
+      previous = step.personId;
+    }
+    if (!kinds.size) return result;
+    const words: Record<string, [string, string, string]> = {
+      adopted: ['through adoption', 'گود لینے کے رشتے سے', 'गोद के रिश्ते से'],
+      foster: ['through foster parentage', 'پرورش کے رشتے سے', 'पालक संबंध से'],
+      step: ['through recorded step-parentage', 'درج شدہ سوتیلے رشتے سے', 'दर्ज सौतेले संबंध से'],
+      other: ['through recorded parentage', 'درج شدہ والدینی رشتے سے', 'दर्ज अभिभावक संबंध से']
+    };
+    const labels = [...kinds].map(kind => words[kind] || words.other);
+    // A shared adoptive parent is not evidence of a biological half-sibling.
+    const halfThroughParentage = /^(Paternal|Maternal) Half-/.test(result.en);
+    const en = result.en.replace(/^(Paternal|Maternal) Half-/, '');
+    const ur = halfThroughParentage ? (b.gender === 'male' ? 'بھائی' : b.gender === 'female' ? 'بہن' : 'بہن بھائی') : result.ur;
+    const hi = halfThroughParentage ? (b.gender === 'male' ? 'भाई' : b.gender === 'female' ? 'बहन' : 'सहोदर') : result.hi;
+    return {
+      en: `${en} (${labels.map(x => x[0]).join('; ')})`,
+      ur: `${ur} (${labels.map(x => x[1]).join('؛ ')})`,
+      hi: `${hi} (${labels.map(x => x[2]).join('; ')})`,
+      details: 'This connection includes recorded non-biological parentage; it does not assert a blood relationship.'
+    };
+  }
+
+  private identifyBaseRelationship(a: FamilyMember, b: FamilyMember): { en: string; ur: string; hi: string; details?: string } {
     // b's relationship to a (i.e. "b is a's ...")
     const bGender = b.gender;
     const aParents = this.getParents(a.id);
@@ -307,6 +404,12 @@ export class KinshipEngine {
       }
     }
 
+    // Ancestors/descendants beyond grandparents, with unlimited recorded depth.
+    const ancestors = this.lineagePath(a.id, b.id, 'parent');
+    if (ancestors && ancestors.length >= 3) return this.extendedLineageLabel(ancestors, true);
+    const descendants = this.lineagePath(a.id, b.id, 'child');
+    if (descendants && descendants.length >= 3) return this.extendedLineageLabel(descendants, false);
+
     // 7. Uncles & Aunts (Parents' Siblings)
     for (const p of aParents) {
       const pSibs = this.getSiblings(p.id);
@@ -357,6 +460,28 @@ export class KinshipEngine {
           const termHi = bGender === 'male' ? `${side} चचेरा/ममेरा भाई` : `${side} चचेरी/ममेरी बहन`;
           return { en: `${side} First Cousin`, ur: termUr, hi: termHi };
         }
+      }
+    }
+
+    // A parent's other spouse is a derived connection, not a second biological mother/father.
+    for (const parent of aParents) {
+      if (this.getSpouses(parent.id).some(spouse => spouse.id === b.id)) {
+        return {
+          en: bGender === 'male' ? 'Step-Father (Parent\'s other husband)' : bGender === 'female' ? 'Step-Mother (Parent\'s other wife)' : 'Step-Parent (Parent\'s other spouse)',
+          ur: bGender === 'male' ? 'سوتیلے والد (والدہ کے دوسرے شوہر)' : bGender === 'female' ? 'سوتیلی والدہ (والد کی دوسری بیوی)' : 'والدین کے دوسرے شریک حیات',
+          hi: bGender === 'male' ? 'सौतेले पिता (माता के दूसरे पति)' : bGender === 'female' ? 'सौतेली माता (पिता की दूसरी पत्नी)' : 'अभिभावक के दूसरे जीवनसाथी',
+          details: 'Derived from a recorded parent and spouse link; biological parentage is unchanged.'
+        };
+      }
+    }
+    for (const spouse of aSpouses) {
+      if (this.getChildren(spouse.id).some(child => child.id === b.id)) {
+        return {
+          en: bGender === 'male' ? 'Step-Son (Spouse\'s other child)' : bGender === 'female' ? 'Step-Daughter (Spouse\'s other child)' : 'Step-Child (Spouse\'s other child)',
+          ur: bGender === 'male' ? 'سوتیلا بیٹا (شریک حیات کا بچہ)' : bGender === 'female' ? 'سوتیلی بیٹی (شریک حیات کی بچی)' : 'شریک حیات کی دوسری اولاد',
+          hi: bGender === 'male' ? 'सौतेला बेटा (जीवनसाथी का बच्चा)' : bGender === 'female' ? 'सौतेली बेटी (जीवनसाथी की बच्ची)' : 'जीवनसाथी की दूसरी संतान',
+          details: 'Derived from a spouse and child link; biological parentage is unchanged.'
+        };
       }
     }
 
