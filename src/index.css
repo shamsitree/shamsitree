@@ -1,68 +1,61 @@
 @import "tailwindcss";
 
-/* Phase 5: shared controls and three intentionally different reading experiences. */
-.smart-date-row,.place-input-row{display:flex;align-items:center;border:1px solid #c7d1cb;border-radius:12px;background:white;min-height:44px;position:relative}
-.smart-date-row:focus-within,.place-input-row:focus-within{outline:3px solid #d4ede2;border-color:#28765e}
-.smart-date-row>input,.place-input-row>input{width:100%;min-width:0;padding:10px 12px;color:#172b24;outline:none;border:0;background:transparent;font:inherit}
-.smart-date-row>input[aria-invalid=true]{color:#9e2929}
-.smart-date-row>button{padding:10px;min-height:42px;min-width:36px;color:#65766d}.smart-date-row>button:disabled{opacity:.3}
-.calendar-control{position:relative;display:grid;place-items:center;width:40px;min-width:40px;height:42px;color:#246b55;border-left:1px solid #e5ece6;overflow:hidden;cursor:pointer}
-.calendar-control input{position:absolute;inset:0;width:40px;height:42px;opacity:.01;cursor:pointer;padding:0;border:0}
-.calendar-control input::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
-.field-help{font-size:11px;line-height:1.5;color:#586b60;margin-top:5px}.field-error{font-size:11px;color:#a02020;margin-top:5px}.field-help a{text-decoration:underline}
-.place-autocomplete{position:relative}.place-input-row>svg{margin:0 10px;color:#6d8476;flex-shrink:0}.place-input-row>input{padding-left:0}.place-results{position:absolute;z-index:40;background:white;top:44px;left:0;right:0;border:1px solid #cad8cd;border-radius:10px;box-shadow:0 12px 30px #183d2920;max-height:240px;overflow:auto;padding:4px;list-style:none}
-.place-results li{padding:10px 9px;border-radius:7px;color:#203d2c;font-size:13px;cursor:pointer}.place-results li:hover,.place-results li.active{background:#e8f4ec}.place-results small{display:block;color:#677e6e;font-size:10px;margin-top:2px}.online-places{display:flex;gap:6px;align-items:center;font-size:11px;color:#405b4c;margin-top:6px}.online-places input{width:14px;height:14px;accent-color:#23684d}
-.phase5-tree{--ink:#203a30;--green:#12684f;color:var(--ink)}.tree-toolbar{background:#fff;border:1px solid #dfe7e0;border-radius:16px;padding:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}.focus-control{display:flex;align-items:center;gap:10px;max-width:100%}.focus-control label{font-size:11px;font-weight:750;letter-spacing:.07em;text-transform:uppercase;color:#687c6e;white-space:nowrap}.focus-control select{padding:9px;border:1px solid #d0dcd2;border-radius:8px;font-size:13px;max-width:230px;background:white}.view-tabs{display:flex;background:#f1f5f0;border:1px solid #e5ebe4;border-radius:12px;padding:4px;gap:3px}.view-tabs button{display:flex;gap:6px;align-items:center;justify-content:center;padding:9px 13px;border-radius:9px;font-size:12px;font-weight:650;color:#54695b;min-height:40px}.view-tabs button[aria-pressed=true]{background:#176b51;color:#fff;box-shadow:0 3px 8px #1b66422b}.print-tree{display:flex;gap:6px;align-items:center;font-size:12px;padding:10px;background:#f6f8f4;border-radius:8px}.tree-options{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:14px 6px;color:#637568;font-size:11px}.tree-options label{display:flex;align-items:center;gap:6px}.tree-options select{border:1px solid #d1ddd1;border-radius:7px;padding:5px;background:white}.tree-options input{accent-color:#206548}.family-canvas{position:relative;isolation:isolate;border-radius:22px;border:1px solid #dce5dc;padding:32px 24px 48px;overflow:hidden;min-height:640px}.scene-heading{text-align:center;position:relative;z-index:1;margin-bottom:30px}.scene-heading>span{font-size:9px;font-weight:800;letter-spacing:.26em;color:#64836b}.scene-heading h3{font-size:25px;letter-spacing:-.03em;margin:7px 0 5px;font-weight:750}.scene-heading p{font-size:12px;color:#657a6b;margin:0}.tree-content{position:relative;z-index:1;max-width:1200px;margin:auto;display:flex;flex-direction:column;align-items:center}.tree-content h4{text-align:center;text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:750;color:#728776;margin:0 0 14px}.elder-section{width:100%;margin-bottom:25px}.elder-row{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}.elder-row .person-card{width:155px;min-height:110px}.elder-row .person-card img{width:36px;height:36px}.elder-row .person-name{font-size:12px}.person-card{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;width:178px;max-width:100%;padding:14px 12px;background:#fff;border:1px solid #ccd9cf;border-radius:12px;cursor:pointer;box-shadow:0 2px 6px #23453508;color:#233c2d;min-height:130px;outline-offset:4px}.person-card:hover{border-color:#3f8965;box-shadow:0 5px 16px #20402c12}.person-card:focus-visible{outline:3px solid #317d61}.person-card.male{background:#f1f7fc;border-color:#bfd6e6}.person-card.female{background:#fff4f5;border-color:#e8c9d0}.person-card img{width:52px;height:52px;border-radius:50%;object-fit:cover;background:#e8efe7;border:3px solid white;box-shadow:0 1px 5px #0001;flex-shrink:0}.person-name{font-size:14px;font-weight:750;line-height:1.4;overflow-wrap:anywhere;margin-top:7px}.person-copy small{display:block;font-size:10px;color:#657564;margin-top:2px}.person-relation{font-size:9px;font-weight:750;letter-spacing:.06em;color:#536f60;margin-bottom:8px;text-transform:uppercase}.parents-row{display:flex;justify-content:center;flex-wrap:wrap;gap:40px;position:relative}.parents-row:after{content:'';position:absolute;height:1px;background:#98b5a0;left:25%;right:25%;bottom:-14px}.parents-section{position:relative}.root-connector{height:35px;width:2px;background:#a6bca8;margin:0 auto;flex-shrink:0}.parents-section .root-connector{margin-top:14px}.add-parent{width:150px;min-height:100px;border:1px dashed #afc5b5;border-radius:12px;background:#ffffffa8;color:#4a775d;font-size:12px}.focus-section{display:flex;flex-direction:column;align-items:center}.focus-card{width:242px!important;background:#eaf5eb!important;border:2px solid #39865b!important;padding:19px 20px;box-shadow:0 8px 22px #27724514}.focus-card img{width:75px;height:75px}.focus-card .person-name{font-size:19px}.root-actions{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:12px}.root-actions button{display:flex;align-items:center;gap:5px;padding:7px 10px;font-size:10px;border-radius:8px;border:1px solid #d2dfd3;background:white;color:#45614d;min-height:34px}.branch-section{width:100%}.branch-help{font-size:11px;text-align:center;color:#647b69;margin:-7px 0 22px}.marriage-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px;align-items:start;position:relative}.marriage-grid:before{content:'';position:absolute;left:15%;right:15%;height:1px;background:#98b5a0;top:-13px}.marriage-branch{position:relative;border:1px solid #d4e1d5;border-radius:14px;background:#ffffffc9;padding:16px;display:flex;flex-direction:column;align-items:center;min-width:0}.marriage-branch:before{content:'';position:absolute;top:-14px;left:50%;height:13px;width:1px;background:#98b5a0}.branch-heading{display:flex;justify-content:space-between;gap:10px;width:100%;font-size:10px;color:#735b65;text-transform:uppercase;letter-spacing:.07em;font-weight:650;margin-bottom:14px}.children-connector{height:20px;width:1px;background:#a4bda9}.branch-children{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;width:100%}.branch-children .person-card{width:170px;min-height:112px;padding:10px}.branch-children .person-card img{width:42px;height:42px}.branch-children .person-name{font-size:12px}.descendant-group{display:flex;flex-direction:column;align-items:center}.next-generation{padding:10px 5px 0;text-align:center;border-left:1px solid #afc7b6;margin:8px 0 0;max-width:190px}.next-generation>span{font-size:9px;text-transform:uppercase;display:block;color:#738a7c}.next-generation button{font-size:11px;background:white;border:1px solid #dbe5dc;border-radius:6px;display:block;padding:5px;margin:4px auto;color:#376149}.next-generation small{font-size:9px;color:#738172;display:block}.branch-add,.show-more{display:flex;align-items:center;gap:5px;font-size:11px;color:#1b7555;padding:8px 14px;border-radius:8px;background:#e9f6ed;margin-top:14px;border:1px solid #c6e4d0;min-height:36px}.show-more{background:white;color:#415e4e}.empty-branch{text-align:center;font-size:12px;line-height:1.6;color:#7c8c7d;padding:20px}.empty-tree{text-align:center;background:white;padding:50px;border-radius:20px;display:grid;justify-items:center;gap:12px}.empty-tree button{background:#176b51;color:white;padding:10px 16px;border-radius:10px}.view-classic{background:linear-gradient(#fff,#f8fbf8)}
-/* Natural, botanical treatment: the SVG never encodes actual relationships. */
-.view-heritage{background:radial-gradient(ellipse at 50% 15%,#f4f2d9,#eaf0dc 45%,#e0e9d2);border-color:#c6d3b3;box-shadow:inset 0 0 100px #8b9b6820;padding-bottom:65px}.heritage-decoration{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}.view-heritage .scene-heading h3{font-family:Georgia,serif;font-weight:400;font-size:34px;color:#34513a}.view-heritage .scene-heading>span{color:#937d44}.view-heritage .scene-heading p{font-family:Georgia,serif;font-style:italic}.view-heritage .person-card{border-radius:50% 50% 18px 18px / 22px 22px 18px 18px;background:#fffdf3e8;border-color:#a6b78c;box-shadow:0 5px 16px #4b64381b}.view-heritage .person-card img{border-color:#e8e4ca;outline:1px solid #b1b994}.view-heritage .focus-card{background:#fcf7df!important;border-color:#8d9f68!important;border-width:3px!important}.view-heritage .focus-card img{width:90px;height:90px}.view-heritage .person-name{font-family:Georgia,serif;font-size:16px}.view-heritage .focus-card .person-name{font-size:24px}.view-heritage .marriage-grid{gap:38px}.view-heritage .marriage-branch{background:#f8f8e58f;border-color:#afbf95;border-radius:45px 45px 22px 22px;padding:22px 16px}.view-heritage .root-connector{background:#8a825a;width:5px;border-radius:4px}.view-heritage .marriage-grid:before{height:5px;border-radius:60%;background:#89966e}.view-heritage .marriage-branch:before{background:#89966e;width:3px}.view-heritage .branch-heading{color:#64764b}.view-heritage .branch-add{background:#e4ebd4;border-color:#b8c9a1;color:#486342}.view-heritage .elder-row .person-card{background:#fcf9ece3}.view-heritage .parents-row:after{height:3px;background:#94a478}
-/* Album: large framed portraits and separate household pages, not a colour swap. */
-.view-album{background:#eee9e0;border-color:#d8cec0;background-image:repeating-linear-gradient(0deg,#ffffff12 0px,#ffffff12 1px,transparent 1px,transparent 5px);padding:34px 32px 48px}.view-album .scene-heading h3{font-family:Georgia,serif;font-weight:400;font-size:34px;color:#5a493e}.view-album .scene-heading>span{color:#9b7c57}.view-album .tree-content h4{color:#9c7c57}.view-album .parents-section{width:100%;padding-bottom:18px}.view-album .parents-row{gap:24px}.view-album .person-card{background:#fffdf8!important;border:0!important;box-shadow:0 5px 16px #3e2f231c;border-radius:3px;padding:10px 10px 15px;width:190px;min-height:0}.view-album .person-card img{width:100%;height:135px;border:0;box-shadow:none;border-radius:1px;object-fit:cover}.view-album .person-name{font-family:Georgia,serif;font-size:17px;font-weight:500;margin-top:8px;color:#483c32}.view-album .person-relation{color:#876e51;letter-spacing:.12em;font-size:8px}.album-caption{font-family:Georgia,serif;font-style:italic;display:block;font-size:10px;color:#9a856d;margin-top:5px}.view-album .focus-section{width:100%;max-width:720px;background:#fbf9f2;padding:20px;border:1px solid #ded2c1;box-shadow:0 5px 20px #5c463817;border-radius:6px;position:relative}.view-album .focus-card{display:grid;grid-template-columns:125px 1fr;width:100%!important;gap:12px 24px;box-shadow:none;background:transparent!important;text-align:left;padding:0}.view-album .focus-card>img{grid-column:1;grid-row:1/3;height:150px;width:125px;outline:5px solid #fff;box-shadow:0 3px 12px #42301f25;transform:rotate(-2deg)}.view-album .focus-card .person-relation{grid-column:2;align-self:end;margin:0}.view-album .focus-card .person-copy{grid-column:2;align-self:start}.view-album .focus-card .person-name{font-size:27px}.view-album .root-actions{margin-top:20px}.view-album .elder-row .person-card{width:125px;transform:rotate(-1deg)}.view-album .elder-row .person-card:nth-child(even){transform:rotate(1deg)}.view-album .elder-row .person-card img{height:82px;width:100%;border-radius:0}.view-album .elder-row .person-name{font-size:12px}.view-album .elder-row .person-relation{font-size:7px}.view-album .marriage-grid{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px}.view-album .marriage-branch{background:#faf7ef;border:1px solid #d4c6b0;border-radius:3px;box-shadow:4px 4px 0 #e2d8c9,7px 7px 0 #f7f0e4;padding:22px 18px}.view-album .branch-heading{font-family:Georgia,serif;font-size:12px;text-transform:none;letter-spacing:0;color:#80674a;border-bottom:1px solid #e1d6c6;padding-bottom:12px}.view-album .branch-children{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:13px;align-items:start}.view-album .branch-children .person-card{width:100%;padding:7px 7px 12px;transform:rotate(1deg);min-height:0}.view-album .branch-children .person-card img{width:100%;height:105px;border-radius:0}.view-album .branch-children .person-name{font-size:15px}.view-album .descendant-group{width:100%;min-width:0}.view-album .root-connector,.view-album .children-connector{width:1px;background:#c8b797;height:22px}.view-album .parents-row:after{display:none}.view-album .branch-add{background:#f0e8d7;border-color:#dac9ad;color:#735d3d}.view-album .branch-help{color:#897358}.view-album .marriage-grid:before{background:#c8b797}.view-album .marriage-branch:before{background:#c8b797}
-@media(max-width:650px){.tree-toolbar{padding:10px;gap:10px}.focus-control{width:100%;justify-content:space-between}.focus-control select{max-width:70%}.view-tabs{width:100%;order:3}.view-tabs button{flex:1;padding:8px 5px;font-size:11px;gap:4px}.print-tree{margin-left:auto}.family-canvas{padding:26px 12px 35px}.scene-heading h3{font-size:22px}.view-heritage .scene-heading h3,.view-album .scene-heading h3{font-size:28px}.parents-row{gap:12px}.parents-row .person-card{width:135px;padding:10px 7px}.add-parent{width:120px}.marriage-grid{grid-template-columns:1fr;gap:24px}.view-album{padding:26px 14px}.view-album .parents-row .person-card{width:125px}.view-album .parents-row .person-card img{height:90px}.view-album .focus-section{padding:14px}.view-album .focus-card{grid-template-columns:85px 1fr;gap:10px 16px}.view-album .focus-card>img{width:85px;height:115px}.view-album .focus-card .person-name{font-size:22px}.view-album .marriage-grid{grid-template-columns:1fr}.elder-row .person-card{width:125px}.tree-options>span{display:none}}
-@media(prefers-reduced-motion:reduce){.phase5-tree *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-@media print{body{background:white!important}.tree-toolbar,.tree-options,.root-actions,.branch-add,.show-more,.add-parent,.sandbox-banner,.sandbox-actions,nav,header{display:none!important}.family-canvas{border:0!important;overflow:visible!important;min-height:0;box-shadow:none!important;padding:0!important;background:white!important}.heritage-decoration{opacity:.18}.person-card,.marriage-branch,.view-album .focus-section{break-inside:avoid;box-shadow:none!important}.person-card{border:1px solid #999!important}.view-album .person-card{transform:none!important}.scene-heading{margin-bottom:15px}.marriage-grid{display:flex!important;flex-wrap:wrap;justify-content:center;gap:14px!important}.marriage-branch{flex:1 1 220px}.person-name{color:#000!important}.tree-content{max-width:none}.elder-row{gap:8px}}
-.sandbox-banner{background:#fff7dc;border-bottom:1px solid #ecdba5;color:#695321;display:flex;justify-content:center;gap:16px;flex-wrap:wrap;padding:10px 16px;font-size:11px}.sandbox-banner strong{letter-spacing:.13em}.sandbox-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 18px}.sandbox-actions p{flex:1;font-size:12px;color:#67786d;min-width:200px}.sandbox-actions button{padding:9px 12px;background:white;border:1px solid #cddbcf;border-radius:9px;font-size:12px;color:#2c664c}.sandbox-actions button:first-of-type{background:#176b51;color:white}.sandbox-message{padding:10px 14px;background:#e5f4e9;color:#285b3c;font-size:12px;border-radius:9px;margin:10px 0}.sample-directory{padding:24px;background:white;border:1px solid #dde5dd;border-radius:16px}.sample-directory h2{font-size:22px;font-weight:700;margin-bottom:15px}.sample-directory article{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-top:1px solid #e5ece4;padding:12px 0;font-size:12px}.sample-directory article strong{min-width:140px}.sample-directory article span{flex:1;color:#687d6d}.sample-directory button{padding:8px 12px;border:1px solid #d4e0d5;border-radius:8px;color:#286b4a}
+@custom-variant dark (&:where(.dark, .dark *));
 
-/* Phase 5 refinement: botanical connectors belong to the genealogy layout,
-   rather than placing unrelated name boxes on top of a tree illustration. */
-.view-heritage .tree-content{gap:0}
-.view-heritage .parents-section,.view-heritage .focus-section,.view-heritage .branch-section{position:relative}
-.view-heritage .parents-row:after,.view-heritage .marriage-grid:before{background:linear-gradient(90deg,transparent,#66824d 15%,#66824d 85%,transparent);height:4px;border-radius:100%}
-.view-heritage .root-connector{width:8px;background:linear-gradient(90deg,#8b704d,#526e40,#9d8355);border-radius:12px;height:42px}
-.view-heritage .marriage-branch{background:linear-gradient(145deg,#fdfcf2f5,#edf3e6ed);border:2px solid #a9be8e;box-shadow:0 8px 24px #496c3620}
-.view-heritage .marriage-branch:before{width:7px;background:#718b53;border-radius:6px}
-.view-heritage .person-card{background:linear-gradient(145deg,#fffef5,#f1f6e7);border:2px solid #a4bc89;box-shadow:0 7px 20px #42642c20;transform:none}
-.view-heritage .person-card:after{content:'';position:absolute;bottom:-7px;left:calc(50% - 7px);width:14px;height:14px;border-radius:1px 100% 1px 100%;transform:rotate(45deg);background:#88a76c;opacity:.65;pointer-events:none}
-.view-heritage .person-card:hover{box-shadow:0 10px 24px #42642c30;border-color:#628b4c}
-.view-heritage .children-connector{background:#77935d;width:4px;border-radius:6px}
-.view-heritage .branch-children{gap:16px}
-.view-heritage .branch-add{position:relative;z-index:2}
-@media(max-width:650px){.view-heritage .root-connector{height:30px}.view-heritage .marriage-grid{gap:26px}}
-@media print{.view-heritage .person-card:after{display:none}}
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: #1e293b;
+    background-color: #f8fafc;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
 
-/* Heritage v2: relationships create the tree; no static image or fake background branches. */
-.view-heritage{background:radial-gradient(ellipse at top,#f8f9e9 0%,#eef4e5 52%,#e4efdb 100%);box-shadow:inset 0 0 65px #60834913}
-.view-heritage .tree-content{width:100%;max-width:1200px}
-.view-heritage .elder-section,.view-heritage .parents-section,.view-heritage .focus-section,.view-heritage .branch-section{z-index:1}
-.view-heritage .parents-section{width:100%}
-.view-heritage .parents-row{gap:26px}
-.view-heritage .parents-row:after{bottom:-18px;left:35%;right:35%;height:5px;background:#7e9b65}
-.view-heritage .root-connector{height:46px;width:10px;background:linear-gradient(90deg,#526b3f,#a2b17b,#597747);box-shadow:2px 0 0 #59774720}
-.view-heritage .person-card{border-radius:45% 45% 20px 20px / 25% 25% 20px 20px;border:2px solid #8cae72;background:#fffdf5!important;box-shadow:0 9px 0 -5px #72965e,0 12px 25px #436e3630;min-height:145px}
-.view-heritage .person-card.male{border-color:#80a5a6}
-.view-heritage .person-card.female{border-color:#bf9ca4}
-.view-heritage .person-card:after{bottom:-10px;width:18px;height:18px;background:#729e61;z-index:-1}
-.view-heritage .focus-card{border-radius:42% 42% 20px 20px / 24% 24% 20px 20px;min-width:250px;box-shadow:0 11px 0 -5px #597d44,0 18px 30px #3c6b3540}
-.view-heritage .focus-section{padding:8px 14px 0}
-.view-heritage .root-actions{background:#f5f8ecdd;border:1px solid #cadbb9;border-radius:12px;padding:6px}
-.view-heritage .branch-section{margin-top:0}
-.view-heritage .marriage-grid{gap:28px;padding-top:18px}
-.view-heritage .marriage-grid:before{top:0;left:15%;right:15%;height:6px;background:linear-gradient(90deg,#78975c,#a4b98a,#78975c);border-radius:6px}
-.view-heritage .marriage-branch{background:linear-gradient(#fcfdf5f2,#f3f8e9e8);border:2px solid #9cb887;border-radius:36px 36px 18px 18px;box-shadow:0 7px 22px #496f3321;padding:24px 16px}
-.view-heritage .marriage-branch:before{top:-19px;height:19px;width:7px;background:#7c9d62;border-radius:6px}
-.view-heritage .branch-heading{font-size:11px;color:#526d42}
-.view-heritage .children-connector{height:27px;width:7px;background:#80a368}
-.view-heritage .branch-children{gap:16px;position:relative}
-.view-heritage .branch-children .person-card{min-height:128px}
-.view-heritage .branch-children .descendant-group{position:relative}
-.view-heritage .next-generation{border-left:3px solid #8aaa70}
-@media(max-width:650px){.view-heritage .marriage-grid:before{display:none}.view-heritage .marriage-branch:before{top:-25px;height:25px}.view-heritage .person-card{min-height:125px}.view-heritage .root-connector{height:30px}}
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.font-outfit {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Custom scrollbars for clean studio panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}
+
+/* Print export styling */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .tree-canvas-container {
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+    position: static !important;
+  }
+}

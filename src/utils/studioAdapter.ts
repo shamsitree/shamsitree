@@ -1,4 +1,4 @@
-import type { FamilyMember, FamilyUnion, FamilyChild } from '../types/family';
+import type { FamilyMember, FamilyUnion, FamilyChild, Person } from '../types/family';
 
 /** Read-only bridge for the Google AI Design Studio. Never writes to Supabase. */
 export interface StudioPerson {
@@ -50,3 +50,17 @@ export function toStudioPeople(members:readonly FamilyMember[], unions:readonly 
  }
  return [...result.values()];
 }
+
+export function toStudioMap(
+  members: readonly FamilyMember[],
+  unions: readonly FamilyUnion[],
+  links: readonly FamilyChild[]
+): Record<string, Person> {
+  const people = toStudioPeople(members, unions, links);
+  const map: Record<string, Person> = {};
+  for (const p of people) {
+    map[p.id] = p;
+  }
+  return map;
+}
+

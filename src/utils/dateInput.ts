@@ -24,6 +24,7 @@ export function parseDateInput(text: string): {iso: string; error: string} {
 export function dateRangeError(iso: string,min?:string,max?:string):string {
   if(!iso)return '';
   if(!validISODate(iso))return 'Please enter a valid date.';
+  if(Number(iso.slice(0,4))<1800||Number(iso.slice(0,4))>2100)return 'Year must be between 1800 and 2100.';
   if(min&&iso<min)return `Date cannot be before ${displayDate(min)}.`;
   if(max&&iso>max)return `Date cannot be after ${displayDate(max)}.`;
   return '';

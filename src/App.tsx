@@ -418,7 +418,7 @@ export default function App() {
             members={members}
             unions={unions}
             children={children}
-            currentUserId={currentUser?.id}
+            treeId={currentTree?.id} currentUserId={currentUser?.id}
             language={language}
             onSelectMember={(m) => setSelectedDetailMember(m)}
             onAddRelative={handleAddRelative}

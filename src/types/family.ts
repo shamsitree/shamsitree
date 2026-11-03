@@ -1,12 +1,17 @@
 /**
- * ShamsiTree 7.8 Unified — Core Type Definitions
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ * ShamsiTree Unified 7.8 — Core & Family Tree Design Studio Type Definitions
  */
 
 export type Gender = 'male' | 'female' | 'other';
 export type MarriageStatus = 'married' | 'divorced' | 'widowed' | 'unknown';
 export type ChildRelationshipType = 'biological' | 'adopted' | 'foster' | 'step';
 export type UnionRelationshipType = 'spouse' | 'single_parent';
+export type RelationshipType = 'biological' | 'adopted' | 'foster';
+export type SupportedLanguage = 'en' | 'hi' | 'ur';
 
+/* Database & Persistence Schema */
 export interface FamilyTree {
   id: string;
   owner_user_id: string;
@@ -92,4 +97,92 @@ export interface FamilyMemory {
   created_at: string;
 }
 
-export type SupportedLanguage = 'en' | 'hi' | 'ur';
+/* Family Tree Design Studio Visual Models */
+export interface SpouseRelationship {
+  spouseId: string;
+  marriageDate?: string;
+  marriagePlace?: string;
+  marriageStatus?: 'current' | 'divorced' | 'widowed';
+  order: number;
+  notes?: string;
+}
+
+export interface Person {
+  id: string;
+  firstName: string;
+  lastName: string;
+  arabicName?: string;
+  gender: Gender;
+  birthDate?: string;
+  birthPlace?: string;
+  deathDate?: string;
+  deathPlace?: string;
+  isLiving: boolean;
+  avatarUrl?: string;
+  avatarColor?: string;
+  generation: number;
+  bio?: string;
+  occupation?: string;
+  spouses: SpouseRelationship[];
+  parentIds: string[];
+  motherId?: string;
+  fatherId?: string;
+  marriageBranchId?: string;
+  relationshipType?: RelationshipType;
+  tags?: string[];
+  notes?: string;
+}
+
+/** Read-only bridge alias for Design Studio */
+export type StudioPerson = Person;
+
+export type TreeStyleId =
+  | 'classic'
+  | 'natural-living'
+  | 'royal-heritage'
+  | 'photo-album'
+  | 'circular-radial'
+  | 'fan-chart'
+  | 'modern-minimalist'
+  | 'timeline'
+  | 'islamic-geometric'
+  | 'starry-night'
+  | 'vintage-scroll'
+  | 'horizontal-lineage'
+  | 'interactive-network';
+
+export interface TreeStyleInfo {
+  id: TreeStyleId;
+  name: string;
+  shortDesc: string;
+  visualTheme: string;
+  iconName: string;
+  badgeText: string;
+  accentColor: string;
+}
+
+export interface TreeViewFilter {
+  startPersonId: string;
+  endPersonId?: string;
+  selectedMemberIds: string[];
+  generationLimit: number | 'all';
+  minGeneration?: number;
+  maxGeneration?: number;
+  activeMarriageBranches: Record<string, string[]>;
+  includeSpouses?: boolean;
+  includeBridgeAncestors: boolean;
+}
+
+export interface CustomTreeView {
+  id: string;
+  name: string;
+  description: string;
+  styleId: TreeStyleId;
+  startPersonId: string;
+  endPersonId?: string;
+  selectedMemberIds: string[];
+  generationLimit: number | 'all';
+  activeMarriageBranches: Record<string, string[]>;
+  includeBridgeAncestors: boolean;
+  createdAt: string;
+}
