@@ -189,6 +189,15 @@ export class KinshipEngine {
           if (edge.type === 'parent') desc = targetMember.gender === 'male' ? 'Father' : targetMember.gender === 'female' ? 'Mother' : 'Parent';
           else if (edge.type === 'child') desc = targetMember.gender === 'male' ? 'Son' : targetMember.gender === 'female' ? 'Daughter' : 'Child';
           else if (edge.type === 'spouse') desc = targetMember.gender === 'male' ? 'Husband' : 'Wife';
+          if (edge.type !== 'spouse' && edge.meta?.relationshipType && edge.meta.relationshipType !== 'biological') {
+            const pathLabels: Record<string, [string, string]> = {
+              adopted: ['Adoptive Parent', 'Adopted Child'],
+              foster: ['Foster Parent', 'Foster Child'],
+              step: ['Step-Parent', 'Step-Child'],
+              other: ['Recorded Parent', 'Recorded Child']
+            };
+            desc = (pathLabels[edge.meta.relationshipType] || pathLabels.other)[edge.type === 'parent' ? 0 : 1];
+          }
 
           const nextStep: KinshipPathStep = {
             personId: targetMember.id,

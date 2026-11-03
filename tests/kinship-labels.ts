@@ -53,6 +53,10 @@ test('indirect adoption qualifier appears in Urdu and Hindi',()=>{
   assert.match(rel('grandson','adoptedSon').relationshipUr,/گود/);
   assert.match(rel('grandson','adoptedSon').relationshipHi,/गोद/);
 });
+test('genealogical path marks adopted edges in both directions',()=>{
+  assert.equal(rel('grandson','adoptedSon').path.at(-1)!.stepDescription,'Adopted Child');
+  assert.equal(rel('adoptedSon','grandson').path[0].stepDescription,'Adoptive Parent');
+});
 test('biological relationships elsewhere remain unqualified',()=>{
   assert.equal(rel('grandson','adoptiveFather').relationshipEn,'Maternal Grandfather');
   assert.equal(rel('son','grandfather').relationshipEn,'Paternal Grandfather');

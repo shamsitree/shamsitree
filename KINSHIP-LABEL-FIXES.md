@@ -11,7 +11,10 @@ The existing unified interface and stored family records are preserved.
 - A parent's other spouse and the reverse spouse's other child have derived
   step-parent/step-child labels. These labels do not add another biological parent.
 
-Validation: all 87 automated checks pass (61 existing plus 26 new cases), TypeScript
+Genealogical paths also mark non-biological edges, for example Adopted Child instead
+of an unqualified Son, in both directions.
+
+Validation: all 88 automated checks pass (61 existing plus 27 new cases), TypeScript
 passes, and the production Vite build succeeds. The supplied 16-member demo snapshot
 was also evaluated three times: 240 ordered non-self pairs per run, identical results,
 no connectivity/reciprocity mismatches, and none of the 16 great-grandparent directions
