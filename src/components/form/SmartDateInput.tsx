@@ -9,7 +9,7 @@ export function SmartDateInput({label,value,onChange,min,max,onErrorChange}:Prop
  const parsed=parseDateInput(draft),error=parsed.error||dateRangeError(parsed.iso,min,max);
  useEffect(()=>{input.current?.setCustomValidity(error);onErrorChange?.(error);},[error,onErrorChange]);
  function calendarChange(iso:string){if(!dateRangeError(iso,min,max)){setDraft(displayDate(iso));onChange(iso);}}
- function type(text:string){setDraft(text);const p=parseDateInput(text);const err=p.error||dateRangeError(p.iso,min,max);input.current?.setCustomValidity(err);if(!err)onChange(p.iso);}
+ function type(text:string){const digits=text.replace(/\D/g,'');const formatted=/^\d*$/.test(text.replace(/\//g,'')) ? [digits.slice(0,2),digits.slice(2,4),digits.slice(4,8)].filter(Boolean).join('/') : text;setDraft(formatted);const p=parseDateInput(formatted);const err=p.error||dateRangeError(p.iso,min,max);input.current?.setCustomValidity(err);if(!err)onChange(p.iso);}
  return <div className="smart-date">
   <div className="smart-date-row">
    <input id={id} ref={input} aria-label={label} aria-invalid={!!error} aria-describedby={`${id}-help`} placeholder="DD/MM/YYYY" inputMode="numeric" autoComplete="off" value={draft} onChange={e=>type(e.target.value)} onBlur={()=>{if(!error)setDraft(displayDate(parsed.iso));}} />
