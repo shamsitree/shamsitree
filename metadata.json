@@ -1,0 +1,6 @@
+{
+  "name": "ShamsiTree — Universal Family System",
+  "description": "Universal family tree application supporting multi-generational ancestry, distinct marriage branches, kinship analysis, and persistent family records.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

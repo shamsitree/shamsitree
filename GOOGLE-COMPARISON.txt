@@ -1,0 +1,16 @@
+src/App.tsx: differs
+src/main.tsx: differs
+src/index.css: identical
+src/types/family.ts: identical
+src/utils/supabaseClient.ts: identical
+src/data/initialShamsiData.ts: identical
+src/utils/kinshipEngine.ts: differs
+src/utils/photoStorage.ts: identical
+src/components/Navigation.tsx: identical
+src/components/Dashboard.tsx: identical
+src/components/FamilyTreeViewer.tsx: identical
+src/components/MemberModal.tsx: differs
+src/components/MemberDetailModal.tsx: identical
+src/components/KinshipFinder.tsx: identical
+src/components/MemoriesManager.tsx: identical
+src/components/TestRunner.tsx: differs

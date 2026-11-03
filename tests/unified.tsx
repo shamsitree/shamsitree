@@ -1,0 +1,18 @@
+import React from 'react';
+import {create,act} from 'react-test-renderer';
+import assert from 'node:assert/strict';
+import {FamilyTreeViewer} from '../src/components/FamilyTreeViewer';
+(globalThis as any).IS_REACT_ACT_ENVIRONMENT=true;
+const members=[['g','Abdul Ghani','male'],['a','Anwar Kamal','male'],['m','Abdul Mannan','male'],['r1','Ruhi Kamal','female'],['r2','Ruhi Fakhir','female'],['s','Sidra Kamal','female'],['u','Unknown mother child','male']].map(([id,full_name,gender])=>({id,full_name,gender,tree_id:'t'}));
+const unions=[['up','m',null],['one','a','r1'],['two','a','r2'],['single','a',null]].map(([id,partner1_id,partner2_id])=>({id,partner1_id,partner2_id,tree_id:'t',relationship_type:partner2_id?'spouse':'single_parent',marriage_status:'unknown'}));
+const children=[['up','a'],['one','g'],['two','s'],['single','u']].map(([family_union_id,child_id],i)=>({id:String(i),tree_id:'t',family_union_id,child_id,relationship_type:'biological'}));
+const before=JSON.stringify({members,unions,children});let selected:any=null,details:any=null;
+let view:any;await act(async()=>{view=create(<FamilyTreeViewer members={members as any} unions={unions as any} children={children as any} language="en" onSelectMember={m=>details=m.id} onAddRelative={(m,r,u)=>selected=u?.id} onOpenAddMember={()=>{}}/>)});
+const focus=()=>view.root.findByProps({'aria-label':'Focus Person'}).props.value;
+const click=async(name:string)=>{const card=view.root.findAll((n:any)=>n.type==='div'&&typeof n.props.onClick==='function'&&n.findAll((x:any)=>x.type==='div'&&x.children.length===1&&x.children[0]===name).length>0)[0];assert.ok(card,name);await act(async()=>card.props.onClick())};
+assert.equal(focus(),'g');await click('Anwar Kamal');assert.equal(focus(),'a');await click('Abdul Mannan');assert.equal(focus(),'m');await click('Anwar Kamal');assert.equal(focus(),'a');console.log('PASS Ghani -> father -> grandfather -> father focus journey');
+assert.ok(JSON.stringify(view.toJSON()).includes('Unknown mother child'));console.log('PASS single-parent child remains visible alongside marriages');
+const addButtons=view.root.findAll((n:any)=>n.type==='button'&&n.findAll((x:any)=>x.type==='span'&&x.children[0]==='Add Child').length>0);assert.equal(addButtons.length,2);await act(async()=>addButtons[1].props.onClick());assert.equal(selected,'two');console.log('PASS specific marriage Add Child callback');
+await click('Sidra Kamal');assert.equal(focus(),'s');await click('Sidra Kamal');assert.equal(details,'s');console.log('PASS Sidra focus and details');
+assert.equal(JSON.stringify({members,unions,children}),before);console.log('PASS navigation never mutates people/relationships');
+await act(async()=>view.unmount());

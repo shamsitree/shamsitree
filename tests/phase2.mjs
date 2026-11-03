@@ -1,0 +1,26 @@
+import {readFileSync} from 'node:fs';
+import {stripTypeScriptTypes} from 'node:module';
+import assert from 'node:assert/strict';
+const code=stripTypeScriptTypes(readFileSync(new URL('../src/utils/relationshipWorkspace.ts',import.meta.url),'utf8'),{mode:'transform'});
+const {MemoryRepository,parentsOf,candidates}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
+let n=0;const test=(name,f)=>{f();console.log('PASS',name);n++};
+const base=()=>({version:0,owners:{A:'alice',B:'bob'},receipts:{},proposals:[],people:[['mannan','Abdul Mannan'],['anwar','Anwar Kamal'],['ruhi1','Ruhi Kamal'],['ruhi2','Ruhi Fakhir'],['ghani','Abdul Ghani'],['sidra','Sidra Kamal']].map(([id,name])=>({id,name,tree:'A'})),unions:[{id:'ancestry',tree:'A',parents:['mannan'],children:['anwar'],kind:'biological'},{id:'m1',tree:'A',parents:['anwar','ruhi1'],children:['ghani'],kind:'biological'},{id:'m2',tree:'A',parents:['anwar','ruhi2'],children:['sidra'],kind:'biological'}]});
+const move={type:'parentage',child:'ghani',union:{id:'m2',tree:'A',parents:['anwar','ruhi2'],children:[],kind:'biological'}};
+test('correct initial parents',()=>{const s=base();assert.deepEqual(parentsOf(s,'ghani'),['anwar','ruhi1']);assert.deepEqual(parentsOf(s,'sidra'),['anwar','ruhi2'])});
+test('reassignment removes obsolete link and preserves sibling',()=>{const r=new MemoryRepository(base());r.commit('alice',0,'move',move);assert.deepEqual(parentsOf(r.snapshot,'ghani'),['anwar','ruhi2']);assert.deepEqual(r.snapshot.unions[1].children,[]);assert.deepEqual(r.snapshot.unions[2].children,['sidra','ghani'])});
+test('failed commit leaves original unchanged',()=>{const r=new MemoryRepository(base()),before=JSON.stringify(r.snapshot);assert.throws(()=>r.commit('alice',0,'move',move,true));assert.equal(JSON.stringify(r.snapshot),before)});
+test('retry is idempotent',()=>{const r=new MemoryRepository(base());r.commit('alice',0,'move',move);r.commit('alice',0,'move',move);assert.equal(r.snapshot.version,1)});
+test('stale concurrent update rejected',()=>{const r=new MemoryRepository(base());r.commit('alice',0,'move',move);assert.throws(()=>r.commit('alice',0,'move2',move),/Concurrent/)});
+test('unauthorized write rejected',()=>assert.throws(()=>new MemoryRepository(base()).commit('bob',0,'move',move),/authorized/));
+test('shared marriage cannot be overwritten',()=>assert.throws(()=>new MemoryRepository(base()).commit('alice',0,'x',{...move,union:{...move.union,parents:['anwar','ruhi1']}}),/overwritten/));
+test('cycle rejected',()=>assert.throws(()=>new MemoryRepository(base()).commit('alice',0,'x',{type:'parentage',child:'mannan',union:{id:'cycle',tree:'A',parents:['ghani'],children:[],kind:'biological'}}),/Circular/));
+test('existing member reused',()=>{const r=new MemoryRepository(base());r.commit('alice',0,'edit',{type:'person',person:{...r.snapshot.people[0],name:'Abdul Mannan updated'}});assert.equal(r.snapshot.people.length,6)});
+function cross(){const s=base();s.people.push({id:'external',tree:'B',name:'Abdul Ghani'});return new MemoryRepository(s)}
+const proposal={type:'propose',proposal:{id:'p',from:'A',to:'B',parent:'anwar',child:'external',status:'pending',kind:'biological'}};
+test('proposal has no relationship effect before approval',()=>{const r=cross();r.commit('alice',0,'p',proposal);assert.deepEqual(parentsOf(r.snapshot,'external'),[])});
+test('recipient approval creates combined relationship without merging records',()=>{const r=cross();r.commit('alice',0,'p',proposal);r.commit('bob',1,'yes',{type:'decision',id:'p',decision:'approved'});assert.deepEqual(parentsOf(r.snapshot,'external'),['anwar']);assert.equal(r.snapshot.people.length,7)});
+test('sender cannot approve own proposal',()=>{const r=cross();r.commit('alice',0,'p',proposal);assert.throws(()=>r.commit('alice',1,'yes',{type:'decision',id:'p',decision:'approved'}),/authorized/)});
+for(const decision of ['rejected','cancelled'])test(decision+' preserves original people',()=>{const r=cross();r.commit('alice',0,'p',proposal);r.commit(decision==='rejected'?'bob':'alice',1,'no',{type:'decision',id:'p',decision});assert.equal(r.snapshot.people.length,7);assert.deepEqual(parentsOf(r.snapshot,'external'),[])});
+test('duplicate proposals rejected',()=>{const r=cross();r.commit('alice',0,'p',proposal);assert.throws(()=>r.commit('alice',1,'p2',{...proposal,proposal:{...proposal.proposal,id:'p2'}}),/Duplicate/)});
+test('name discovery does not verify identity and respects allowed scope',()=>{const r=cross();const found=candidates(r.snapshot,'Ghani',['B']);assert.equal(found.length,1);assert.equal(found[0].verified,false);assert.equal(r.snapshot.proposals.length,0)});
+console.log(n,'Phase 2 checks passed (in-memory implementation, not Supabase)');
