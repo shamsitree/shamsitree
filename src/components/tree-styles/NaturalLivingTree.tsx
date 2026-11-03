@@ -36,8 +36,9 @@ export const NaturalLivingTree: React.FC<NaturalLivingTreeProps> = ({
 
   // Layout parameters for organic tree
   // Gen 1 near bottom (trunk crown), higher gens fan outward and upward
-  const width = 1600;
-  const height = 1200;
+  const widestGeneration = Math.max(1,...Object.values(genGroups).map(group=>group.length));
+  const width = Math.max(1600,(widestGeneration-1)*220+440);
+  const height = Math.max(1200,(Math.max(1,...gens)-1)*200+400);
   const trunkBaseX = width / 2;
   const trunkBaseY = height - 60;
   const crownY = height - 260;
@@ -51,7 +52,7 @@ export const NaturalLivingTree: React.FC<NaturalLivingTreeProps> = ({
     // Y position goes up as generation increases
     // Gen 1 at y = 920, Gen 2 at 720, Gen 3 at 500, Gen 4 at 300, Gen 5 at 140
     const yGen = trunkBaseY - 200 - (gen - 1) * 200;
-    const spreadX = Math.min(width - 240, 200 + (gen * 240));
+    const spreadX = Math.max(200,(n-1)*220);
     const startX = trunkBaseX - spreadX / 2;
     const stepX = n > 1 ? spreadX / (n - 1) : 0;
 
@@ -70,7 +71,7 @@ export const NaturalLivingTree: React.FC<NaturalLivingTreeProps> = ({
 
   return (
     <div className="relative w-full h-full min-h-[850px] bg-gradient-to-b from-sky-50/70 via-emerald-50/40 to-amber-50/60 overflow-hidden select-none">
-      <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`}>
+      <svg className="w-full h-full" viewBox={`0 0 ${width} ${height}`} width={width} height={height} style={{width,height,maxWidth:'none'}}>
         <defs>
           {/* Bark Gradient */}
           <linearGradient id="barkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
