@@ -17,7 +17,7 @@ IMPORTANT: This branch is a review build. Before any separately approved product
 ## Executed verification
 - Combined automated suite: 102 checks pass (88 existing plus 14 focused Phase5 checks).
 - TypeScript: npm run lint passes (tsc --noEmit).
-- Vite production build: passes. Review bundle CSS 53.06kB / gzip11.10kB, entry JS221.66kB / gzip69.47kB, lazy sandbox310.60kB / gzip83.77kB, lazy decoration1.69kB / gzip0.85kB.
+- Vite production build: passes. Review bundle CSS 53.06kB / gzip11.10kB, entry JS221.66kB / gzip69.47kB, lazy sandbox310.70kB / gzip83.81kB, lazy decoration1.69kB / gzip0.85kB.
 - Date typing/calendar/clearing, invalid dates and leap years: component/pure-function tests pass.
 - Address manual/keyboard selection, opt-in debounce, cancellation, failure and privacy guards: tests pass.
 - Anwar’s Ghani/Ruhi Kamal and Sidra/Ruhi Fakhir branches, shared father and half siblings: pass.
@@ -25,10 +25,12 @@ IMPORTANT: This branch is a review build. Before any separately approved product
 - Local sample save/edit/serialization/reload: pass.
 - Node benchmark: 1209 members, indexed bounded scene 1.26ms in one recorded run; not a mobile/browser performance guarantee.
 
-Browser visual checks, live provider availability, physical mobile devices, print hardware and full production persistence are not claimed by these automated checks. Production records must never be used for destructive testing. Native calendar UI depends on the browser.
+Chrome desktop visual checks confirmed distinct Classic, Heritage and Album layouts, correct visible marriage branches, invalid-date save blocking, leap-day text synchronization, Rampur keyboard selection and sample persistence after reload. Expired preview access triggered the Classic fallback successfully; renewing access restored Heritage. Calendar input now handles both native input and change events. Live provider availability, physical mobile devices, print hardware and full production persistence are not claimed by these automated checks. Production records must never be used for destructive testing. Native calendar UI depends on the browser.
 
 ## Changed files
 MemberModal.tsx, FamilyTreeViewer.tsx, index.css, main.tsx, package.json, vercel.json; new SmartDateInput.tsx, PlaceAutocomplete.tsx, HeritageDecoration.tsx, Phase5Sandbox.tsx, dateInput.ts, placeSearch.ts, familyViewModel.ts, sandboxSave.ts, phase5Family.ts, tests/phase5.tsx and this report.
 
 ## Rollback
 Production is unchanged, so no production rollback is needed. Remove the preview branch alias/deployment to retire the review. Source backup is backup/before-phase5-20261103 at the baseline SHA above. If changes are later merged with explicit approval, revert the Phase5 commits through a reviewed PR and redeploy the known-good commit. No database rollback is required because Phase5 makes no schema or production data changes. Reset sample data only clears the isolated preview’s versioned browser-local sample.
+
+Preview: https://shamsitree-phase5-preview.vercel.app/ (Vercel share access required; supplied separately). The review share link expires 10 November 2026 UTC.
