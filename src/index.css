@@ -38,3 +38,31 @@
 .view-heritage .branch-add{position:relative;z-index:2}
 @media(max-width:650px){.view-heritage .root-connector{height:30px}.view-heritage .marriage-grid{gap:26px}}
 @media print{.view-heritage .person-card:after{display:none}}
+
+/* Heritage v2: relationships create the tree; no static image or fake background branches. */
+.view-heritage{background:radial-gradient(ellipse at top,#f8f9e9 0%,#eef4e5 52%,#e4efdb 100%);box-shadow:inset 0 0 65px #60834913}
+.view-heritage .tree-content{width:100%;max-width:1200px}
+.view-heritage .elder-section,.view-heritage .parents-section,.view-heritage .focus-section,.view-heritage .branch-section{z-index:1}
+.view-heritage .parents-section{width:100%}
+.view-heritage .parents-row{gap:26px}
+.view-heritage .parents-row:after{bottom:-18px;left:35%;right:35%;height:5px;background:#7e9b65}
+.view-heritage .root-connector{height:46px;width:10px;background:linear-gradient(90deg,#526b3f,#a2b17b,#597747);box-shadow:2px 0 0 #59774720}
+.view-heritage .person-card{border-radius:45% 45% 20px 20px / 25% 25% 20px 20px;border:2px solid #8cae72;background:#fffdf5!important;box-shadow:0 9px 0 -5px #72965e,0 12px 25px #436e3630;min-height:145px}
+.view-heritage .person-card.male{border-color:#80a5a6}
+.view-heritage .person-card.female{border-color:#bf9ca4}
+.view-heritage .person-card:after{bottom:-10px;width:18px;height:18px;background:#729e61;z-index:-1}
+.view-heritage .focus-card{border-radius:42% 42% 20px 20px / 24% 24% 20px 20px;min-width:250px;box-shadow:0 11px 0 -5px #597d44,0 18px 30px #3c6b3540}
+.view-heritage .focus-section{padding:8px 14px 0}
+.view-heritage .root-actions{background:#f5f8ecdd;border:1px solid #cadbb9;border-radius:12px;padding:6px}
+.view-heritage .branch-section{margin-top:0}
+.view-heritage .marriage-grid{gap:28px;padding-top:18px}
+.view-heritage .marriage-grid:before{top:0;left:15%;right:15%;height:6px;background:linear-gradient(90deg,#78975c,#a4b98a,#78975c);border-radius:6px}
+.view-heritage .marriage-branch{background:linear-gradient(#fcfdf5f2,#f3f8e9e8);border:2px solid #9cb887;border-radius:36px 36px 18px 18px;box-shadow:0 7px 22px #496f3321;padding:24px 16px}
+.view-heritage .marriage-branch:before{top:-19px;height:19px;width:7px;background:#7c9d62;border-radius:6px}
+.view-heritage .branch-heading{font-size:11px;color:#526d42}
+.view-heritage .children-connector{height:27px;width:7px;background:#80a368}
+.view-heritage .branch-children{gap:16px;position:relative}
+.view-heritage .branch-children .person-card{min-height:128px}
+.view-heritage .branch-children .descendant-group{position:relative}
+.view-heritage .next-generation{border-left:3px solid #8aaa70}
+@media(max-width:650px){.view-heritage .marriage-grid:before{display:none}.view-heritage .marriage-branch:before{top:-25px;height:25px}.view-heritage .person-card{min-height:125px}.view-heritage .root-connector{height:30px}}
